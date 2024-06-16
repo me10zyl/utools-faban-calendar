@@ -1,50 +1,103 @@
 <script lang="ts">
-import {defineComponent} from "vue";
+import {defineComponent, reactive, Ref, ref} from "vue";
+import ProjectDialog, {Project} from "./ProjectDialog.vue";
+import {FormInstance, FormRules} from "element-plus";
+import type {ValidateFieldsError} from "async-validator";
+import {InternalRuleItem, ValidateOption, Value, Values} from "async-validator/dist-types/interface";
+import CustomFormDialog, {CustomForm} from "./CustomFormDialog.vue";
+import customFormDialog from "./CustomFormDialog.vue";
 
-export interface Env {
-  envName: string,
-  branchName: string,
-  projectPath: string,
-  publishCmd: string,
-  statusCmd: string,
-  startTimeCmd: string
+export interface DefaultOptions {
+  defaultShowSQL: boolean,
+  defaultShowConfCenter: boolean,
+  defaultConfCenterName: string,
+  defaultShowProjectInfo: boolean,
+  /**
+   * 默认自定义表单
+   */
+  defaultCustomForms : CustomForm[]
 }
 
-export interface Project {
-  projectName: string,
-  showSQL: boolean,
-  showConfigCenter: boolean,
-  configCenterName: string,
-  showProjectRemark: string,
-  projectDesc: string,
-  newBranchCmd: string,
-  gitUrl: string,
-  envs: Env[]
+export interface Options {
+  defaultOptions: DefaultOptions,
+  projects: Project
 }
 
 export default defineComponent({
+  computed: {
+    customFormDialog() {
+      return customFormDialog
+    }
+  },
+  components: {CustomFormDialog, ProjectDialog},
   setup(prop, ctx) {
-    const projects: Project[] = [
-      {
-        projectName: '11',
-        showSQL: false,
-        showConfigCenter: false,
-        configCenterName: 'aaaa',
-        showProjectRemark: 'aa',
-        projectDesc: 'aa',
-        newBranchCmd: 'aa',
-        gitUrl: 'aa',
-        envs: []
-      }
-    ];
-    const editProject = () => {
-
+    const customForms = reactive<CustomForm[]>([]);
+    const projectDialog = ref()
+    const projects  = reactive<Project[]>([]);
+    const editProject = (ev) => {
+      console.log('editProject', ev)
+      projectDialog.value.edit()
     }
     const delProject = () => {
+      projectDialog.value.del()
+    }
+    const addProject = () => {
+      projectDialog.value.add()
+    }
+    const projectDialogVisible = ref(false)
+    const saveDefaultConf = async (formEl: FormInstance) => {
+      await formEl.validate((isValid: boolean, invalidFields?: ValidateFieldsError) => {
+        if (isValid) {
 
+        } else {
+
+        }
+      });
+    }
+    const formData = reactive<DefaultOptions>({
+      defaultConfCenterName: "nacos",
+      defaultShowConfCenter: true,
+      defaultShowProjectInfo: true,
+      defaultShowSQL: true,
+      defaultCustomForms: []
+    })
+    const formEl = ref<FormInstance>()
+    const rules = reactive<FormRules<DefaultOptions>>({
+      defaultConfCenterName: [{
+        required: false, message: '若展示默认中心默认配置中心名称必填', trigger: 'blur',
+        validator: (rule: InternalRuleItem, value: Value, callback: (error?: string | Error) => void,
+                    source: Values, options: ValidateOption) => {
+          return !formData.defaultShowConfCenter || value.trim() !== ''
+        }
+      }],
+      defaultShowSQL: [{required: true}]
+    });
+    const customFormDialog = ref<InstanceType<typeof CustomFormDialog> | null>(null)
+    const customFormAdd = (el : InstanceType<typeof CustomFormDialog> | null)=>{
+      el.add()
+    }
+    const customFormEdit = (el : InstanceType<typeof CustomFormDialog> | null)=>{
+      el.edit()
+    }
+    const customFormDel = (el : InstanceType<typeof CustomFormDialog> | null)=>{
+      el.del()
     }
     return {
-      projects, delProject, editProject
+      projects,
+      delProject,
+      editProject,
+      addProject,
+      projectDialogVisible,
+      projectDialog,
+      saveDefaultConf,
+      formData,
+      formEl,
+      rules,
+      customForms,
+      customFormDialog,
+      customFormAdd,
+      customFormEdit,
+      customFormDel
     }
   }
 })
@@ -53,38 +106,48 @@ export default defineComponent({
 
 <template>
   <div class="el-container">
-    <div class="el-col-12 el-col-lg-offset-5">
-      <el-form style="margin-bottom: 10px">
+    <div class="el-col-12">
+      <el-form style="margin-bottom: 10px" :model="formData" ref="formEl" :rules="rules" label-position="left">
         <div>项目默认配置</div>
         <hr/>
         <div>
-          <el-form-item>
-            <el-checkbox>默认展示SQL</el-checkbox>
+          <el-form-item prop="defaultShowSQL" label="默认展示SQL" :label-width="120">
+            <el-checkbox v-model="formData.defaultShowSQL"></el-checkbox>
           </el-form-item>
           <div class="panel" style="margin-bottom: 5px">
-            <el-form-item>
-              <el-checkbox>默认展示配置中心</el-checkbox>
+            <el-form-item label="默认展示配置中心" :label-width="120" prop="defaultShowConfCenter">
+              <el-checkbox v-model="formData.defaultShowConfCenter"></el-checkbox>
             </el-form-item>
-            <el-form-item>
-              <label>默认配置中心名称</label>
-              <el-input placeholder="nacos"/>
+            <el-form-item label="默认配置中心名称" :label-width="120" prop="defaultConfCenterName">
+              <el-input placeholder="nacos" v-model="formData.defaultConfCenterName" size="small" class="el-col-12"/>
             </el-form-item>
           </div>
-          <el-form-item>
-            <el-checkbox>默认展示项目说明</el-checkbox>
+          <el-form-item label="默认展示项目说明" :label-width="120" prop="defaultShowProjectInfo">
+            <el-checkbox v-model="formData.defaultShowProjectInfo"></el-checkbox>
+          </el-form-item>
+          <el-form-item label="默认自定义表单" :label-width="120" prop="defaultCustomForms">
+            <el-button @click="customFormAdd(customFormDialog)">添加自定义菜单</el-button>
+            <el-table :data="formData.defaultCustomForms" border style="margin-top:10px;" width="100%">
+              <el-table-column prop="label" label="表单标签" width="100"/>
+              <el-table-column prop="type" label="表单类型" width="100"/>
+              <el-table-column label="操作">
+                <el-button @click="customFormEdit(customFormDialog)">编辑</el-button>
+                <el-button @click="customFormDel(customFormDialog)">删除</el-button>
+              </el-table-column>
+            </el-table>
           </el-form-item>
         </div>
         <div>
-          <el-button>保存默认配置</el-button>
+          <el-button @click="saveDefaultConf(formEl)">保存默认配置</el-button>
         </div>
       </el-form>
       <div>
         <div>项目配置</div>
         <hr/>
-        <el-button type="primary">新增项目</el-button>
+        <el-button type="primary" @click="addProject">新增项目</el-button>
         <el-table :data="projects" border style="margin-top:10px;" width="100%">
           <el-table-column prop="projectName" label="项目名称" width="100"/>
-          <el-table-column prop="projectDesc" label="项目描述" width="500"/>
+          <el-table-column prop="projectDesc" label="项目描述" width="300"/>
           <el-table-column label="操作">
             <el-button @click="editProject">编辑</el-button>
             <el-button @click="delProject">删除</el-button>
@@ -94,12 +157,13 @@ export default defineComponent({
     </div>
 
   </div>
+  <ProjectDialog ref="projectDialog" :projects="projects"/>
+  <CustomFormDialog ref="customFormDialog" :custom-forms="customForms"/>
 </template>
 
 <style scoped>
 .panel {
   border: 1px dashed #00000011;
-  padding: 10px;
 }
 
 a {

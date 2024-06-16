@@ -1,14 +1,8 @@
 <script lang="ts">
 import {defineComponent, PropType, reactive, ref} from "vue";
+import {Env} from "../js/options";
 
-export interface Env {
-  envName: string,
-  fabanBranchName: string,
-  projectPath: string,
-  publishCmd: string,
-  statusCmd: string,
-  startTimeCmd: string
-}
+
 
 export default defineComponent({
   props : {

@@ -1,27 +1,14 @@
 <script lang="ts">
 import {defineComponent, reactive, Ref, ref} from "vue";
-import ProjectDialog, {Project} from "./ProjectDialog.vue";
-import {FormInstance, FormRules} from "element-plus";
+import ProjectDialog from "./ProjectDialog.vue";
+import {ElMessage, FormInstance, FormRules} from "element-plus";
 import type {ValidateFieldsError} from "async-validator";
 import {InternalRuleItem, ValidateOption, Value, Values} from "async-validator/dist-types/interface";
-import CustomFormDialog, {CustomForm} from "./CustomFormDialog.vue";
+import CustomFormDialog from "./CustomFormDialog.vue";
 import customFormDialog from "./CustomFormDialog.vue";
-
-export interface DefaultOptions {
-  defaultShowSQL: boolean,
-  defaultShowConfCenter: boolean,
-  defaultConfCenterName: string,
-  defaultShowProjectInfo: boolean,
-  /**
-   * 默认自定义表单
-   */
-  defaultCustomForms : CustomForm[]
-}
-
-export interface Options {
-  defaultOptions: DefaultOptions,
-  projects: Project
-}
+import storage from "../js/storage";
+import {CustomForm, DefaultOptions, Project} from "../js/options";
+import myStorage from "../js/myStorage";
 
 export default defineComponent({
   computed: {
@@ -31,9 +18,8 @@ export default defineComponent({
   },
   components: {CustomFormDialog, ProjectDialog},
   setup(prop, ctx) {
-    const customForms = reactive<CustomForm[]>([]);
     const projectDialog = ref()
-    const projects  = reactive<Project[]>([]);
+    const projects = reactive<Project[]>([]);
     const editProject = (ev) => {
       console.log('editProject', ev)
       projectDialog.value.edit()
@@ -48,9 +34,8 @@ export default defineComponent({
     const saveDefaultConf = async (formEl: FormInstance) => {
       await formEl.validate((isValid: boolean, invalidFields?: ValidateFieldsError) => {
         if (isValid) {
-
-        } else {
-
+          myStorage.saveDefaultConf(formData)
+          ElMessage('保存默认配置成功')
         }
       });
     }
@@ -73,14 +58,14 @@ export default defineComponent({
       defaultShowSQL: [{required: true}]
     });
     const customFormDialog = ref<InstanceType<typeof CustomFormDialog> | null>(null)
-    const customFormAdd = (el : InstanceType<typeof CustomFormDialog> | null)=>{
+    const customFormAdd = (el: InstanceType<typeof CustomFormDialog> | null) => {
       el.add()
     }
-    const customFormEdit = (el : InstanceType<typeof CustomFormDialog> | null)=>{
-      el.edit()
+    const customFormEdit = (el: InstanceType<typeof CustomFormDialog> | null, row: CustomForm) => {
+      el.edit(row)
     }
-    const customFormDel = (el : InstanceType<typeof CustomFormDialog> | null)=>{
-      el.del()
+    const customFormDel = (el: InstanceType<typeof CustomFormDialog> | null, row: CustomForm) => {
+      el.del(row)
     }
     return {
       projects,
@@ -93,7 +78,6 @@ export default defineComponent({
       formData,
       formEl,
       rules,
-      customForms,
       customFormDialog,
       customFormAdd,
       customFormEdit,
@@ -129,10 +113,12 @@ export default defineComponent({
             <el-button @click="customFormAdd(customFormDialog)">添加自定义菜单</el-button>
             <el-table :data="formData.defaultCustomForms" border style="margin-top:10px;" width="100%">
               <el-table-column prop="label" label="表单标签" width="100"/>
-              <el-table-column prop="type" label="表单类型" width="100"/>
+              <el-table-column prop="typeString" label="表单类型" width="100"/>
               <el-table-column label="操作">
-                <el-button @click="customFormEdit(customFormDialog)">编辑</el-button>
-                <el-button @click="customFormDel(customFormDialog)">删除</el-button>
+                <template #default="scope">
+                  <el-button @click="customFormEdit(customFormDialog, scope.row)">编辑</el-button>
+                  <el-button @click="customFormDel(customFormDialog, scope.row)">删除</el-button>
+                </template>
               </el-table-column>
             </el-table>
           </el-form-item>
@@ -158,7 +144,7 @@ export default defineComponent({
 
   </div>
   <ProjectDialog ref="projectDialog" :projects="projects"/>
-  <CustomFormDialog ref="customFormDialog" :custom-forms="customForms"/>
+  <CustomFormDialog ref="customFormDialog" :custom-forms="formData.defaultCustomForms"/>
 </template>
 
 <style scoped>

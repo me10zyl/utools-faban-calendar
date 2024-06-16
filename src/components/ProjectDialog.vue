@@ -4,18 +4,7 @@ import EnvDialog, {Env} from "./EnvDialog.vue";
 import {FormInstance, FormItemRule, FormRules} from "element-plus";
 
 
-export interface Project {
-  branch: string,
-  projectName: string,
-  showSQL: boolean,
-  showConfigCenter: boolean,
-  configCenterName: string,
-  showProjectRemark: string,
-  projectDesc: string,
-  newBranchCmd: string,
-  gitUrl: string,
-  envs: Env[]
-}
+
 export default defineComponent({
   props: {
     projects : {

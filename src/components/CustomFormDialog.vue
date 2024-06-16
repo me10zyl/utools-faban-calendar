@@ -23,7 +23,8 @@ function getLabel(type: CustomType): CustomTypeLabel | null {
 export default defineComponent({
   props: {
     customForms: {
-      type: Object as PropType<CustomForm[]>
+      type: Object as PropType<CustomForm[]>,
+      required: true
     }
   },
   setup(props) {
@@ -32,10 +33,12 @@ export default defineComponent({
       type: 'checkbox',
       typeString: '复选框'
     });
+    let editObject = null;
     const edit = (row: CustomForm) => {
       dialogVisible.value = true
       title.value = '编辑自定义表单'
       Object.assign(formData, row)
+      editObject = row
     }
     const del = (row: CustomForm) => {
       props.customForms.splice(props.customForms.indexOf(row), 1)
@@ -51,13 +54,20 @@ export default defineComponent({
       if (formEl.value) {
         formEl.value.resetFields()
       }
+      editObject = null
     }
 
     const save = async (formEl: FormInstance) => {
       await formEl.validate((isValid, invalidFields) => {
         if (isValid) {
           handle(formData)
-          props.customForms.push(Object.assign({}, formData))
+          //新增
+          if(editObject == null) {
+            props.customForms.push(Object.assign({}, formData))
+          //编辑
+          }else {
+            Object.assign(editObject, formData)
+          }
           dialogVisible.value = false
         }
       });

@@ -1,33 +1,59 @@
 <script lang="ts">
 import {defineComponent, PropType, reactive, ref} from "vue";
 import {Env} from "../js/options";
+import {FormInstance, FormRules} from "element-plus";
 
 
 
 export default defineComponent({
   props : {
-
+    envs : {
+      type : Object as PropType<Env[]>,
+      required: true
+    }
   },
-  setup() {
+  setup(props) {
     const formData: Env = <Env>reactive({})
-    const edit = () => {
+    let editObject = null;
+    const edit = (row) => {
       dialogVisible.value = true;
       title.value = '编辑环境'
+      Object.assign(formData, row)
+      editObject  = row;
     }
     const add = () => {
       dialogVisible.value = true;
       title.value = '添加环境'
+      if(formEl.value){
+        formEl.value.resetFields()
+      }
+      editObject = null
     }
-    const del = (envName) => {
-
+    const del = (row) => {
+      props.envs.splice(props.envs.indexOf(row), 1)
     }
     const dialogVisible = ref(false);
     const title = ref('添加环境');
-    const save = ()=>{
-      dialogVisible.value = false
+    const save = async (formEl: FormInstance)=>{
+      await formEl.validate((isValid, invalidFields) => {
+        if(isValid){
+          dialogVisible.value = false
+          if(editObject == null) {
+            props.envs.push(Object.assign({}, formData))
+          }else{
+            Object.assign(editObject, formData)
+          }
+        }
+      });
     }
+    const formEl = ref<FormInstance>()
+    const rules = reactive<FormRules<Env>>({
+      envName: [{required: true, message: '环境名称必填'}],
+      fabanBranchName: [{required:true, message: '发版分支名称必填'}],
+      projectPath: [{required:true, message: '本地项目路径必填'}]
+    })
     return {
-      edit, add, del, dialogVisible, title, formData, save
+      edit, add, del, dialogVisible, title, formData, save, formEl, rules
     }
   }
 })
@@ -35,30 +61,30 @@ export default defineComponent({
 
 <template>
   <el-dialog v-model="dialogVisible" :title="title" width="600" height="700">
-    <el-form>
-      <el-form-item label="环境名称" v-model="formData.envName" :label-width="100">
-        <el-input />
+    <el-form ref="formEl" :model="formData" :rules="rules">
+      <el-form-item label="环境名称" :label-width="100" prop="envName">
+        <el-input v-model="formData.envName" class="el-col-12"/>
       </el-form-item>
-      <el-form-item label="发版分支名" v-model="formData.fabanBranchName" :label-width="100">
-        <el-input />
+      <el-form-item label="发版分支名称" :label-width="100" prop="fabanBranchName">
+        <el-input v-model="formData.fabanBranchName"  class="el-col-12" />
       </el-form-item>
-      <el-form-item label="项目路径" v-model="formData.projectPath" :label-width="100">
-        <el-input />
+      <el-form-item label="本地项目路径" :label-width="100" prop="projectPath">
+        <el-input  v-model="formData.projectPath" />
       </el-form-item>
-      <el-form-item label="发版命令" v-model="formData.publishCmd" :label-width="100">
-        <el-input type="textarea"/>
+      <el-form-item label="发版命令" :label-width="100" prop="publishCmd">
+        <el-input type="textarea"  v-model="formData.publishCmd"/>
       </el-form-item>
-      <el-form-item label="程序运行状态检测命令" v-model="formData.statusCmd" :label-width="100">
-        <el-input type="textarea"/>
+      <el-form-item label="程序运行状态检测命令"  :label-width="100" prop="statusCmd">
+        <el-input type="textarea" v-model="formData.statusCmd"/>
       </el-form-item>
-      <el-form-item label="程序运行开始时间查询命令" v-model="formData.startTimeCmd" :label-width="100">
-        <el-input type="textarea"/>
+      <el-form-item label="程序运行开始时间查询命令"  :label-width="100" prop="startTimeCmd">
+        <el-input type="textarea" v-model="formData.startTimeCmd"/>
       </el-form-item>
     </el-form>
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="save">
+        <el-button type="primary" @click="save(formEl)">
           保存
         </el-button>
       </div>

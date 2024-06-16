@@ -1,12 +1,12 @@
 import storage from "./storage";
-import {DefaultOptions} from "./options";
+import {Options} from "./options";
 
 
 export default {
-    saveDefaultConf(options: DefaultOptions):void {
-        storage.setItem('defaultOptions', options)
+    saveOptions(options: Options):void {
+        storage.setItem('faban-calendar-options', options)
     },
-    getDefaultConf(){
-        storage.getItem('defaultOptions')
+    getOptions(): Options{
+        return storage.getItemObject<Options>('faban-calendar-options')
     }
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-import {defineComponent, reactive, Ref, ref} from "vue";
+import {defineComponent, onMounted, reactive, Ref, ref, watch} from "vue";
 import ProjectDialog from "./ProjectDialog.vue";
 import {ElMessage, FormInstance, FormRules} from "element-plus";
 import type {ValidateFieldsError} from "async-validator";
@@ -7,7 +7,7 @@ import {InternalRuleItem, ValidateOption, Value, Values} from "async-validator/d
 import CustomFormDialog from "./CustomFormDialog.vue";
 import customFormDialog from "./CustomFormDialog.vue";
 import storage from "../js/storage";
-import {CustomForm, DefaultOptions, Project} from "../js/options";
+import {CustomForm, DefaultOptions, Options, Project} from "../js/options";
 import myStorage from "../js/myStorage";
 
 export default defineComponent({
@@ -31,13 +31,17 @@ export default defineComponent({
       projectDialog.value.add()
     }
     const projectDialogVisible = ref(false)
-    const saveDefaultConf = async (formEl: FormInstance) => {
-      await formEl.validate((isValid: boolean, invalidFields?: ValidateFieldsError) => {
-        if (isValid) {
-          myStorage.saveDefaultConf(formData)
-          ElMessage('保存默认配置成功')
-        }
-      });
+    const validateForm =  () => {
+      return new Promise((resolve, reject)=>{
+        if(!formEl.value) reject(false)
+        formEl.value.validate((isValid: boolean, invalidFields?: ValidateFieldsError) => {
+          if (isValid) {
+            resolve(isValid)
+          }else {
+            reject(isValid)
+          }
+        });
+      })
     }
     const formData = reactive<DefaultOptions>({
       defaultConfCenterName: "nacos",
@@ -54,8 +58,7 @@ export default defineComponent({
                     source: Values, options: ValidateOption) => {
           return !formData.defaultShowConfCenter || value.trim() !== ''
         }
-      }],
-      defaultShowSQL: [{required: true}]
+      }]
     });
     const customFormDialog = ref<InstanceType<typeof CustomFormDialog> | null>(null)
     const customFormAdd = (el: InstanceType<typeof CustomFormDialog> | null) => {
@@ -67,6 +70,24 @@ export default defineComponent({
     const customFormDel = (el: InstanceType<typeof CustomFormDialog> | null, row: CustomForm) => {
       el.del(row)
     }
+    onMounted(()=>{
+      let opts:Options = myStorage.getOptions();
+      Object.assign(formData, opts?.defaultOptions)
+      let projects_ = opts?.projects;
+      if(projects_){
+        projects_.forEach(e=>projects.push(e))
+      }
+    })
+    const options: Options = reactive<Options>({
+      defaultOptions: formData as DefaultOptions,
+      projects: projects as Project[]
+    })
+    watch(options, async (value, oldValue, onCleanup) => {
+        let valid = await validateForm();
+        if(valid){
+          myStorage.saveOptions(options)
+        }
+    })
     return {
       projects,
       delProject,
@@ -74,7 +95,6 @@ export default defineComponent({
       addProject,
       projectDialogVisible,
       projectDialog,
-      saveDefaultConf,
       formData,
       formEl,
       rules,
@@ -102,7 +122,7 @@ export default defineComponent({
             <el-form-item label="默认展示配置中心" :label-width="120" prop="defaultShowConfCenter">
               <el-checkbox v-model="formData.defaultShowConfCenter"></el-checkbox>
             </el-form-item>
-            <el-form-item label="默认配置中心名称" :label-width="120" prop="defaultConfCenterName">
+            <el-form-item label="默认配置中心名称" :label-width="120" prop="defaultConfCenterName" v-if="formData.defaultShowConfCenter">
               <el-input placeholder="nacos" v-model="formData.defaultConfCenterName" size="small" class="el-col-12"/>
             </el-form-item>
           </div>
@@ -113,7 +133,7 @@ export default defineComponent({
             <el-button @click="customFormAdd(customFormDialog)">添加自定义菜单</el-button>
             <el-table :data="formData.defaultCustomForms" border style="margin-top:10px;" width="100%">
               <el-table-column prop="label" label="表单标签" width="100"/>
-              <el-table-column prop="typeString" label="表单类型" width="100"/>
+              <el-table-column prop="typeString" label="表单类型" width="60"/>
               <el-table-column label="操作">
                 <template #default="scope">
                   <el-button @click="customFormEdit(customFormDialog, scope.row)">编辑</el-button>
@@ -123,9 +143,6 @@ export default defineComponent({
             </el-table>
           </el-form-item>
         </div>
-        <div>
-          <el-button @click="saveDefaultConf(formEl)">保存默认配置</el-button>
-        </div>
       </el-form>
       <div>
         <div>项目配置</div>
@@ -133,7 +150,7 @@ export default defineComponent({
         <el-button type="primary" @click="addProject">新增项目</el-button>
         <el-table :data="projects" border style="margin-top:10px;" width="100%">
           <el-table-column prop="projectName" label="项目名称" width="100"/>
-          <el-table-column prop="projectDesc" label="项目描述" width="300"/>
+          <el-table-column prop="projectDesc" label="项目描述" width="150"/>
           <el-table-column label="操作">
             <el-button @click="editProject">编辑</el-button>
             <el-button @click="delProject">删除</el-button>

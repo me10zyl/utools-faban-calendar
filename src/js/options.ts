@@ -37,7 +37,7 @@ export interface Env {
 
 export interface Options {
     defaultOptions: DefaultOptions,
-    projects: Project
+    projects: Project[]
 }
 export interface Project {
     branch: string,
@@ -45,9 +45,10 @@ export interface Project {
     showSQL: boolean,
     showConfigCenter: boolean,
     configCenterName: string,
-    showProjectRemark: string,
     projectDesc: string,
     newBranchCmd: string,
     gitUrl: string,
+    showProjectInfo: boolean,
+    customForms: CustomForm[],
     envs: Env[]
 }

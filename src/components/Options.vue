@@ -3,7 +3,7 @@ import {defineComponent, onMounted, reactive, Ref, ref, watch} from "vue";
 import ProjectDialog from "./ProjectDialog.vue";
 import {ElMessage, FormInstance, FormRules} from "element-plus";
 import type {ValidateFieldsError} from "async-validator";
-import {InternalRuleItem, ValidateOption, Value, Values} from "async-validator/dist-types/interface";
+import {InternalRuleItem, ValidateOption, Value, Values} from "async-validator/dist-types/interface.d.ts";
 import CustomFormDialog from "./CustomFormDialog.vue";
 import customFormDialog from "./CustomFormDialog.vue";
 import storage from "../js/storage";

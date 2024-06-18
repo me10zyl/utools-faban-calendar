@@ -84,7 +84,15 @@ export interface Env {
     /**
      * 运行开始时间
      */
-    startTime: string
+    startTime: string,
+    /**
+     * 环境测试地址
+     */
+    envTestUrl: string,
+    /**
+     * jenkins地址
+     */
+    jenkinsUrl: string
 }
 
 export interface Options {

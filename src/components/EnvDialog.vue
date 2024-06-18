@@ -71,6 +71,12 @@ export default defineComponent({
       <el-form-item label="本地项目路径" :label-width="100" prop="projectPath">
         <el-input  v-model="formData.projectPath" />
       </el-form-item>
+      <el-form-item label="环境测试地址"  :label-width="100" prop="envTestUrl">
+        <el-input v-model="formData.envTestUrl"/>
+      </el-form-item>
+      <el-form-item label="jenkins地址"  :label-width="100" prop="jenkinsUrl">
+        <el-input v-model="formData.jenkinsUrl"/>
+      </el-form-item>
       <el-form-item label="发版命令" :label-width="100" prop="publishCmd">
         <el-input type="textarea"  v-model="formData.publishCmd"/>
       </el-form-item>

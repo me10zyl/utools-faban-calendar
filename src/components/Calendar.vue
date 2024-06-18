@@ -1,5 +1,5 @@
 <script lang="ts">
-import {computed, defineComponent, reactive, ref, watch} from "vue";
+import {computed, defineComponent, onMounted, reactive, ref, watch} from "vue";
 import {Item} from "../js/calendar";
 import myStorage from "../js/myStorage";
 import {generateRandomString, now} from "../js/util";
@@ -55,17 +55,28 @@ export default defineComponent({
       selectItem.value = item
     }
     const disableItem = () => {
-      if(selectItem.value.status === 'normal') {
+      if (selectItem.value.status === 'normal') {
         selectItem.value.status = 'abandon';
-      }else {
+      } else {
         selectItem.value.status = 'normal'
       }
     }
-    watch(selectItem, (value, oldValue, onCleanup) => {
-
+    watch(items, (value: Item[], oldValue, onCleanup) => {
+      console.log(items)
+      myStorage.saveCalendar(items);
     })
-
-    const goToSettings = ()=>{
+    onMounted(() => {
+      const calendars = myStorage.getCalendars();
+      calendars.forEach(e => {
+        items.push(e)
+      });
+      items.forEach(e=>{
+        if(e.selected){
+          clickItem(e)
+        }
+      })
+    })
+    const goToSettings = () => {
       router.push('/options')
     }
 
@@ -92,7 +103,8 @@ export default defineComponent({
       </div>
       <el-divider class="dividers"/>
       <ol class="list">
-        <li v-for="item in items" :class="{'select-active': item.selected, 'abandon' : item.status === 'abandon'}" @click="clickItem(item)"
+        <li v-for="item in items" :class="{'select-active': item.selected, 'abandon' : item.status === 'abandon'}"
+            @click="clickItem(item)"
             style="cursor: pointer">
           {{ item.reqName || '新建需求' }}
         </li>
@@ -240,7 +252,7 @@ export default defineComponent({
   color: var(--fontColor);
 }
 
-.abandon{
+.abandon {
   text-decoration: line-through;
 }
 </style>

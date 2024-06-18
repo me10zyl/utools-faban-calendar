@@ -66,6 +66,7 @@ export default defineComponent({
       title.value = '编辑项目'
       Object.assign(formData, row)
       editObject = row
+      console.log('edit', editObject)
     }
     const envDialog = ref<InstanceType<typeof EnvDialog>>()
 

@@ -20,24 +20,23 @@ export default defineComponent({
   setup(prop, ctx) {
     const projectDialog = ref()
     const projects = reactive<Project[]>([]);
-    const editProject = (ev) => {
-      console.log('editProject', ev)
-      projectDialog.value.edit()
+    const editProject = (row:Project) => {
+      projectDialog.value.edit(row)
     }
-    const delProject = () => {
-      projectDialog.value.del()
+    const delProject = (row:Project) => {
+      projectDialog.value.del(row)
     }
     const addProject = () => {
       projectDialog.value.add()
     }
     const projectDialogVisible = ref(false)
-    const validateForm =  () => {
-      return new Promise((resolve, reject)=>{
-        if(!formEl.value) reject(false)
+    const validateForm = () => {
+      return new Promise((resolve, reject) => {
+        if (!formEl.value) reject(false)
         formEl.value.validate((isValid: boolean, invalidFields?: ValidateFieldsError) => {
           if (isValid) {
             resolve(isValid)
-          }else {
+          } else {
             reject(isValid)
           }
         });
@@ -70,12 +69,12 @@ export default defineComponent({
     const customFormDel = (el: InstanceType<typeof CustomFormDialog> | null, row: CustomForm) => {
       el.del(row)
     }
-    onMounted(()=>{
-      let opts:Options = myStorage.getOptions();
+    onMounted(() => {
+      let opts: Options = myStorage.getOptions();
       Object.assign(formData, opts?.defaultOptions)
       let projects_ = opts?.projects;
-      if(projects_){
-        projects_.forEach(e=>projects.push(e))
+      if (projects_) {
+        projects_.forEach(e => projects.push(e))
       }
     })
     const options: Options = reactive<Options>({
@@ -83,10 +82,10 @@ export default defineComponent({
       projects: projects as Project[]
     })
     watch(options, async (value, oldValue, onCleanup) => {
-        let valid = await validateForm();
-        if(valid){
-          myStorage.saveOptions(options)
-        }
+      let valid = await validateForm();
+      if (valid) {
+        myStorage.saveOptions(options)
+      }
     })
     return {
       projects,
@@ -122,7 +121,8 @@ export default defineComponent({
             <el-form-item label="默认展示配置中心" :label-width="120" prop="defaultShowConfCenter">
               <el-checkbox v-model="formData.defaultShowConfCenter"></el-checkbox>
             </el-form-item>
-            <el-form-item label="默认配置中心名称" :label-width="120" prop="defaultConfCenterName" v-if="formData.defaultShowConfCenter">
+            <el-form-item label="默认配置中心名称" :label-width="120" prop="defaultConfCenterName"
+                          v-if="formData.defaultShowConfCenter">
               <el-input placeholder="nacos" v-model="formData.defaultConfCenterName" size="small" class="el-col-12"/>
             </el-form-item>
           </div>
@@ -152,8 +152,14 @@ export default defineComponent({
           <el-table-column prop="projectName" label="项目名称" width="100"/>
           <el-table-column prop="projectDesc" label="项目描述" width="150"/>
           <el-table-column label="操作">
-            <el-button @click="editProject">编辑</el-button>
-            <el-button @click="delProject">删除</el-button>
+            <template #default="scope">
+              <el-button @click="editProject(scope.row)">编辑</el-button>
+              <el-popconfirm title="确认删除?" cancel-button-text="取消" confirm-button-text="确认" @confirm="delProject(scope.row)">
+                <template #reference>
+                  <el-button>删除</el-button>
+                </template>
+              </el-popconfirm>
+            </template>
           </el-table-column>
         </el-table>
       </div>

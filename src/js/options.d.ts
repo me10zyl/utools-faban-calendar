@@ -18,7 +18,11 @@ export interface DefaultOptions {
     /**
      * 默认自定义表单
      */
-    defaultCustomForms: CustomForm[]
+    defaultCustomForms: CustomForm[],
+    /**
+     *
+     */
+    defaultEnvs : Env[]
 }
 export type CustomType = 'checkbox' | 'input' | 'button';
 export type CustomTypeLabel = '复选框' | '输入框' | '按钮'
@@ -37,7 +41,7 @@ export interface CustomForm {
      */
     label: string,
     typeString: string,
-    value?: string
+    value?: string|boolean
 }
 
 export interface Env {

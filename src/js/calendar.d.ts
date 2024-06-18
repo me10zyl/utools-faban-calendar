@@ -1,6 +1,6 @@
 import {Project} from "./options";
 
-export type Status = 'normal' | 'abandon'
+export type Status = 'normal' | 'abandon' | 'finished'
 export interface Item{
     /**
      * guid

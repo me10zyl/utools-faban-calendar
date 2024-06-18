@@ -4,6 +4,7 @@ import {Item} from "../js/calendar";
 import myStorage from "../js/myStorage";
 import {generateRandomString, now} from "../js/util";
 import router from '../router'
+import {ElMessage} from "element-plus";
 
 export default defineComponent({
   setup: (props, ctx) => {
@@ -57,21 +58,28 @@ export default defineComponent({
     const disableItem = () => {
       if (selectItem.value.status === 'normal') {
         selectItem.value.status = 'abandon';
-      } else {
+      } else if(selectItem.value.status === 'abandon') {
         selectItem.value.status = 'normal'
+      } else if(selectItem.value.status === 'finished'){
+        ElMessage('已完成状态不能被废弃')
       }
     }
     watch(items, (value: Item[], oldValue, onCleanup) => {
-      console.log(items)
       myStorage.saveCalendar(items);
+      const errors = checkSuccess(selectItem.value);
+      if (errors.length === 0 && selectItem.value.status === 'normal') {
+        selectItem.value.status = 'finished'
+      }else if(errors.length > 0 && selectItem.value.status !== 'abandon'){
+        selectItem.value.status = 'normal'
+      }
     })
     onMounted(() => {
       const calendars = myStorage.getCalendars();
       calendars.forEach(e => {
         items.push(e)
       });
-      items.forEach(e=>{
-        if(e.selected){
+      items.forEach(e => {
+        if (e.selected) {
           clickItem(e)
         }
       })
@@ -80,9 +88,63 @@ export default defineComponent({
       router.push('/options')
     }
 
+    function checkSuccess(item: Item): string[] {
+      const errors = [];
+      if(!item.project){
+        errors.push("未选择项目")
+        return errors;
+      }
+      if (!(item.isUpdateSQL && item.project.showSQL)) {
+        errors.push("未执行SQL")
+      }
+      if (!(item.isUpdateConfigCenter && item.isUpdateConfigCenter)) {
+        errors.push("未修改配置中心配置")
+      }
+      if (item.project.envs.length > 0) {
+        let strings1 = [];
+        let strings2 = []
+        item.project.envs.filter(e => !e.isPublished || !e.isMergedFabanBranch).forEach(e => {
+          if (!e.isPublished) {
+            strings1.push(e.envName)
+          }
+          if (!e.isMergedFabanBranch) {
+            strings2.push(e.fabanBranchName)
+          }
+        })
+        if (strings2.length > 0) {
+          errors.push('未合并' + strings2.join(',') + '分支')
+        }
+        if (strings1.length > 0) {
+          errors.push('未发布' + strings1.join(',') + '环境')
+        }
+      }
+      if (item.project.customForms.length > 0) {
+        let stringValue = item.project.customForms.filter(e => e.type === 'checkbox' && !(e.value)).map(e => {
+          return "未勾选" + e.label;
+        }).join(",");
+        if (stringValue) {
+          errors.push(stringValue)
+        }
+      }
+      return errors;
+    }
+
+    const checkSuccessText = computed(() => {
+      let text = checkSuccess(selectItem.value);
+      return text.length === 0 ? '已完成': text.join(' ')
+    })
 
     return {
-      items, selectItem, options, deleteItem, clickNew, changeSelectProject, clickItem, disableItem, goToSettings
+      items,
+      selectItem,
+      options,
+      deleteItem,
+      clickNew,
+      changeSelectProject,
+      clickItem,
+      disableItem,
+      goToSettings,
+      checkSuccessText
     }
   }
 })
@@ -103,7 +165,8 @@ export default defineComponent({
       </div>
       <el-divider class="dividers"/>
       <ol class="list">
-        <li v-for="item in items" :class="{'select-active': item.selected, 'abandon' : item.status === 'abandon'}"
+        <li v-for="item in items" :class="{'select-active': item.selected, 'abandon' : item.status === 'abandon'
+        , success: item.status === 'finished'}"
             @click="clickItem(item)"
             style="cursor: pointer">
           {{ item.reqName || '新建需求' }}
@@ -111,7 +174,7 @@ export default defineComponent({
       </ol>
     </el-col>
     <el-col :span="16" class="right">
-      <div :class="{title:true, abandon: selectItem.status === 'abandon'}">
+      <div :class="{title:true, abandon: selectItem.status === 'abandon', success: selectItem.status === 'finished'}">
         {{ selectItem.reqName || (items.filter(e => e.selected).length > 0 ? '新建需求' : '') }}
       </div>
       <el-divider class="dividers"/>
@@ -146,11 +209,12 @@ export default defineComponent({
             </div>
           </el-form-item>
           <template v-if="selectItem.project">
-            <el-form-item :label-width="100">
+            <el-form-item :label-width="100" v-if="selectItem.project.showSQL">
               <el-checkbox v-model="selectItem.isUpdateSQL">已更数据库</el-checkbox>
               <el-input type="textarea" placeholder="数据库文本" v-model="selectItem.sql"/>
             </el-form-item>
-            <el-form-item :label="selectItem.project.configCenterName + '配置'" :label-width="100">
+            <el-form-item :label="selectItem.project.configCenterName + '配置'" :label-width="100"
+                          v-if="selectItem.project.showConfigCenter">
               <el-checkbox v-model="selectItem.isUpdateConfigCenter">
                 已更新{{ selectItem.project.configCenterName }}配置
               </el-checkbox>
@@ -163,14 +227,23 @@ export default defineComponent({
               <el-checkbox v-if="customForm.type === 'checkbox'" v-model="customForm.value"></el-checkbox>
               <el-input v-if="customForm.type === 'input'" v-model="customForm.value"/>
             </el-form-item>
+            <el-form-item :label="env.envName + '环境'" :label-width="100" v-for="env in selectItem.project.envs">
+              <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{ env.fabanBranchName }}分支</el-checkbox>
+              <el-checkbox v-model="env.isPublished">已发版</el-checkbox>
+            </el-form-item>
+            <el-form-item label="项目说明" :label-width="100" v-if="selectItem.project.showProjectInfo">
+              <el-row style="width: 100%">
+                <el-col :span="12">
+                  <el-input type="textarea" v-model="selectItem.projectInfo" :rows="10"/>
+                </el-col>
+              </el-row>
+            </el-form-item>
           </template>
-          <el-form-item label="项目说明" :label-width="100">
-            <el-row style="width: 100%">
-              <el-col :span="12">
-                <el-input type="textarea" v-model="selectItem.projectInfo" :rows="10"/>
-              </el-col>
-            </el-row>
-          </el-form-item>
+
+          <div
+              :class="{successText: true, success: selectItem.status === 'finished', error: selectItem.status !== 'finished' && selectItem.status !== 'abandon'}">
+            状态：<span>{{ checkSuccessText }}</span>
+          </div>
           <div style="padding-left: 20px;display: flex;align-items: center;justify-content: end">
             <div>
               <el-popconfirm title="确认删除?" cancel-button-text="取消" confirm-button-text="确认"
@@ -254,5 +327,25 @@ export default defineComponent({
 
 .abandon {
   text-decoration: line-through;
+}
+
+.successText {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  font-size: 10px;
+  margin-bottom: 10px;
+
+}
+
+.error {
+  color: #c0260e;
+}
+
+.success {
+  color: #258d5e;
+}
+.success::before{
+  content: '√';
 }
 </style>

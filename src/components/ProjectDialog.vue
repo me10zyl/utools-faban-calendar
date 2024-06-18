@@ -46,6 +46,7 @@ export default defineComponent({
       formData.showProjectInfo =  defaultConf.defaultShowProjectInfo;
       formData.customForms =  defaultConf.defaultCustomForms;
       formData.showConfigCenter = defaultConf.defaultShowConfCenter;
+      formData.envs = defaultConf.defaultEnvs;
     }
 
     const add = ()=>{

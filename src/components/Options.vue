@@ -9,6 +9,7 @@ import customFormDialog from "./CustomFormDialog.vue";
 import storage from "../js/storage";
 import {CustomForm, DefaultOptions, Options, Project} from "../js/options";
 import myStorage from "../js/myStorage";
+import EnvDialog from "./EnvDialog.vue";
 
 export default defineComponent({
   computed: {
@@ -16,7 +17,7 @@ export default defineComponent({
       return customFormDialog
     }
   },
-  components: {CustomFormDialog, ProjectDialog},
+  components: {EnvDialog, CustomFormDialog, ProjectDialog},
   setup(prop, ctx) {
     const projectDialog = ref()
     const projects = reactive<Project[]>([]);
@@ -47,7 +48,8 @@ export default defineComponent({
       defaultShowConfCenter: true,
       defaultShowProjectInfo: true,
       defaultShowSQL: true,
-      defaultCustomForms: []
+      defaultCustomForms: [],
+      defaultEnvs: []
     })
     const formEl = ref<FormInstance>()
     const rules = reactive<FormRules<DefaultOptions>>({
@@ -87,7 +89,9 @@ export default defineComponent({
         myStorage.saveOptions(options)
       }
     })
+    const envDialog = ref<InstanceType<typeof EnvDialog>>(null)
     return {
+      envDialog,
       projects,
       delProject,
       editProject,
@@ -142,6 +146,19 @@ export default defineComponent({
               </el-table-column>
             </el-table>
           </el-form-item>
+          <el-form-item label="默认环境" :label-width="100" prop="envs">
+            <el-button @click="envDialog.add()">添加环境</el-button>
+            <el-table :data="formData.defaultEnvs" border style="margin-top:10px;" width="100%">
+              <el-table-column prop="envName" label="环境名称" width="100"/>
+              <el-table-column prop="fabanBranchName" label="发版分支名称" width="100"/>
+              <el-table-column label="操作">
+                <template #default="scope">
+                  <el-button @click="envDialog.edit(scope.row)">编辑</el-button>
+                  <el-button @click="envDialog.del(scope.row)">删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-form-item>
         </div>
       </el-form>
       <div>
@@ -149,7 +166,7 @@ export default defineComponent({
         <hr/>
         <el-button type="primary" @click="addProject">新增项目</el-button>
         <el-table :data="projects" border style="margin-top:10px;" width="100%">
-          <el-table-column prop="projectName" label="项目名称" width="100"/>
+          <el-table-column prop="projectName" label="项目名称" width="160"/>
           <el-table-column prop="projectDesc" label="项目描述" width="150"/>
           <el-table-column label="操作">
             <template #default="scope">
@@ -168,6 +185,7 @@ export default defineComponent({
   </div>
   <ProjectDialog ref="projectDialog" :projects="projects"/>
   <CustomFormDialog ref="customFormDialog" :custom-forms="formData.defaultCustomForms"/>
+  <EnvDialog  ref="envDialog" :envs="formData.defaultEnvs" />
 </template>
 
 <style scoped>

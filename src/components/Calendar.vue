@@ -3,6 +3,7 @@ import {computed, defineComponent, reactive, ref, watch} from "vue";
 import {Item} from "../js/calendar";
 import myStorage from "../js/myStorage";
 import {generateRandomString, now} from "../js/util";
+import router from '../router'
 
 export default defineComponent({
   setup: (props, ctx) => {
@@ -64,9 +65,13 @@ export default defineComponent({
 
     })
 
+    const goToSettings = ()=>{
+      router.push('/options')
+    }
+
 
     return {
-      items, selectItem, options, deleteItem, clickNew, changeSelectProject, clickItem, disableItem
+      items, selectItem, options, deleteItem, clickNew, changeSelectProject, clickItem, disableItem, goToSettings
     }
   }
 })
@@ -83,7 +88,7 @@ export default defineComponent({
           </template>
         </el-popconfirm>
         <el-button @click="disableItem">废弃</el-button>
-        <el-button>设置</el-button>
+        <el-button @click="goToSettings">设置</el-button>
       </div>
       <el-divider class="dividers"/>
       <ol class="list">

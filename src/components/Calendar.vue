@@ -131,7 +131,7 @@ export default defineComponent({
 
     const checkSuccessText = computed(() => {
       let text = checkSuccess(selectItem.value);
-      return text.length === 0 ? '已完成': text.join(' ')
+      return text.length === 0 ? ['已完成'] : text
     })
 
     return {
@@ -230,8 +230,8 @@ export default defineComponent({
             <el-form-item :label="env.envName + '环境'" :label-width="100" v-for="env in selectItem.project.envs">
               <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{ env.fabanBranchName }}分支</el-checkbox>
               <el-checkbox v-model="env.isPublished">已发版</el-checkbox>
-              <el-link :href="env.jenkinsUrl" v-if="env.jenkinsUrl" target="_blank" style="margin-left: 15px">jenkins地址</el-link>
-              <el-link :href="env.envTestUrl" v-if="env.envTestUrl" target="_blank" style="margin-left: 15px">{{env.envName}}环境地址</el-link>
+              <el-link :href="env.jenkinsUrl" v-if="env.jenkinsUrl" target="_blank"  class="link">jenkins地址</el-link>
+              <el-link :href="env.envTestUrl" v-if="env.envTestUrl" target="_blank" class="link">{{env.envName}}环境地址</el-link>
             </el-form-item>
             <el-form-item label="项目说明" :label-width="100" v-if="selectItem.project.showProjectInfo">
               <el-row style="width: 100%">
@@ -244,7 +244,7 @@ export default defineComponent({
 
           <div
               :class="{successText: true, success: selectItem.status === 'finished', error: selectItem.status !== 'finished' && selectItem.status !== 'abandon'}">
-            状态：<span>{{ checkSuccessText }}</span>
+            状态：<el-badge v-for="text in checkSuccessText" type="danger">{{text}}</el-badge>
           </div>
           <div style="padding-left: 20px;display: flex;align-items: center;justify-content: end">
             <div>
@@ -266,6 +266,10 @@ export default defineComponent({
 </template>
 
 <style scoped>
+.link{
+  margin-left: 15px;
+  font-size: calc(var(--fontSize) - 2px);
+}
 .select-active {
   background: #5f616522;
 }
@@ -341,11 +345,11 @@ export default defineComponent({
 }
 
 .error {
-  color: #c0260e;
+  color: #F56C6C;
 }
 
 .success {
-  color: #258d5e;
+  color: #67C23A;
 }
 .success::before{
   content: '√';

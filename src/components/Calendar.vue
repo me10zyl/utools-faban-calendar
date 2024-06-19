@@ -230,8 +230,8 @@ export default defineComponent({
             <el-form-item :label="env.envName + '环境'" :label-width="100" v-for="env in selectItem.project.envs">
               <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{ env.fabanBranchName }}分支</el-checkbox>
               <el-checkbox v-model="env.isPublished">已发版</el-checkbox>
-              <a :href="env.jenkinsUrl" v-if="env.jenkinsUrl" target="_blank">jenkins地址</a>
-              <a :href="env.envTestUrl" v-if="env.envTestUrl" target="_blank">{{env.envName}}环境地址</a>
+              <el-link :href="env.jenkinsUrl" v-if="env.jenkinsUrl" target="_blank" style="margin-left: 15px">jenkins地址</el-link>
+              <el-link :href="env.envTestUrl" v-if="env.envTestUrl" target="_blank" style="margin-left: 15px">{{env.envName}}环境地址</el-link>
             </el-form-item>
             <el-form-item label="项目说明" :label-width="100" v-if="selectItem.project.showProjectInfo">
               <el-row style="width: 100%">

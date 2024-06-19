@@ -20,5 +20,9 @@ export default {
             // @ts-ignore
             utools.redirect('faban')
         }
+    },
+    copy(value: string) {
+        // @ts-ignore
+        utools.copyText(value)
     }
 }

@@ -152,7 +152,7 @@ export default defineComponent({
 
 <template>
   <el-row style="margin: 0;padding: 0">
-    <el-col :span="8" class="left">
+    <el-col :span="7" class="left">
       <div class="toolbox">
         <el-button @click="clickNew">新建</el-button>
         <el-popconfirm title="确认删除?" cancel-button-text="取消" confirm-button-text="确认" @confirm="deleteItem">
@@ -173,7 +173,7 @@ export default defineComponent({
         </li>
       </ol>
     </el-col>
-    <el-col :span="16" class="right">
+    <el-col :span="17" class="right">
       <div :class="{title:true, abandon: selectItem.status === 'abandon', success: selectItem.status === 'finished'}">
         {{ selectItem.reqName || (items.filter(e => e.selected).length > 0 ? '新建需求' : '') }}
       </div>
@@ -181,14 +181,14 @@ export default defineComponent({
       <div class="main">
         <el-form :model="selectItem" v-if="selectItem.id !== ''">
           <el-form-item label="需求名称" :label-width="100">
-            <el-col :span="6">
+            <el-col :span="16">
               <el-input v-model="selectItem.reqName"/>
             </el-col>
           </el-form-item>
           <el-form-item label="选择项目" :label-width="100">
-            <el-col :span="6">
+            <el-col :span="7">
               <el-select v-model="selectItem.selectProjectName" @change="changeSelectProject"
-                         placeholder="选择的项目名称">
+                         placeholder="选择项目">
                 <el-option v-for="project in options.projects"
                            :key="project.projectName"
                            :label="project.projectName"

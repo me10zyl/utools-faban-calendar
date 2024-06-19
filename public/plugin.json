@@ -1,0 +1,36 @@
+{
+  "main": "index.html",
+  "logo": "logo.png",
+  "preload": "preload.js",
+  "features": [
+    {
+      "code": "faban",
+      "explain": "打开发版日历",
+      "cmds": [
+        "faban",
+        {
+          "type": "over",
+          "label": "发版日历",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      ]
+    },
+    {
+      "code": "faban-conf",
+      "explain": "打开发版日历配置",
+      "cmds": [
+        "faban-conf",
+        {
+          "type": "over",
+          "label": "发版日历",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      ]
+    }
+  ],
+  "development": {
+    "main": "http://localhost:5173/"
+  }
+}

@@ -5,6 +5,7 @@ import myStorage from "../js/myStorage";
 import {generateRandomString, now} from "../js/util";
 import router from '../router'
 import {ElMessage} from "element-plus";
+import myUtools from "../js/myUtools";
 
 export default defineComponent({
   setup: (props, ctx) => {
@@ -85,7 +86,7 @@ export default defineComponent({
       })
     })
     const goToSettings = () => {
-      router.push('/options')
+      myUtools.redirect("Options")
     }
 
     function checkSuccess(item: Item): string[] {
@@ -281,7 +282,7 @@ export default defineComponent({
 
 .left {
   background: #cccccc44;
-  height: 100vh;
+  height: 97vh;
 }
 
 .right {
@@ -289,10 +290,12 @@ export default defineComponent({
 }
 
 .list {
-  padding: 0;
-  margin: 0;
+  padding: 0 0 0 0;
+  margin: var(--toolHeight) 0 0 0;
   font-size: var(--fontSize);
   color: var(--fontColor);
+  overflow-y: auto;
+  height: calc(100% - var(--toolHeight) - 5px);
 }
 
 .list li {
@@ -304,6 +307,7 @@ export default defineComponent({
   margin-top: 5px;
   margin-left: 5px;
   height: var(--toolHeight);
+  position: fixed;
 }
 
 .toolbox button {

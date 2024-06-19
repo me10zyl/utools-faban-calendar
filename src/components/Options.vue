@@ -10,9 +10,13 @@ import storage from "../js/storage";
 import {CustomForm, DefaultOptions, Options, Project} from "../js/options";
 import myStorage from "../js/myStorage";
 import EnvDialog from "./EnvDialog.vue";
+import myUtools from "../js/myUtools";
 
 export default defineComponent({
   computed: {
+    myUtools() {
+      return myUtools
+    },
     customFormDialog() {
       return customFormDialog
     }
@@ -114,6 +118,7 @@ export default defineComponent({
 <template>
   <div class="el-container">
     <div class="el-col-12">
+      <el-link style="margin-bottom: 5px" @click="myUtools.redirect('Calendar')">←发版日历</el-link>
       <el-form style="margin-bottom: 10px" :model="formData" ref="formEl" :rules="rules" label-position="left">
         <div>项目默认配置</div>
         <hr/>

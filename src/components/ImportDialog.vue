@@ -26,18 +26,28 @@ const doImport = (importType : ImportType)=>{
     }
     try {
       if (importType === 'calendar') {
-        let calendars = myStorage.getCalendars();
-        json.forEach(e => {
-          calendars.push(e)
-        })
-        myStorage.saveCalendar(calendars)
+        // let calendars = myStorage.getCalendars();
+        // json.forEach(e => {
+        //   calendars.push(e)
+        // })
+        if(json[0].reqName != undefined) {
+          myStorage.saveCalendar(json)
+        }else{
+          ElMessage('导入格式错误')
+          return
+        }
       } else if (importType === 'options') {
-        let options = myStorage.getOptions();
-        json.projects.forEach(e => {
-          options.projects.push(e)
-        })
-        options.defaultOptions = json.defaultOptions
-        myStorage.saveOptions(options)
+        // let options = myStorage.getOptions();
+        // json.projects.forEach(e => {
+        //   options.projects.push(e)
+        // })
+        // options.defaultOptions = json.defaultOptions
+        if('defaultOptions' in json){
+          myStorage.saveOptions(json)
+        }else{
+          ElMessage('导入格式错误')
+          return
+        }
       }
     }catch (e){
       ElMessage('导入失败')

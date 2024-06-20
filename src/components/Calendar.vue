@@ -286,6 +286,7 @@ export default defineComponent({
             </div>
           </el-form-item>
           <template v-if="project">
+            <el-text>{{project.projectDesc}}</el-text>
             <el-form-item :label-width="100" v-if="project.showSQL">
               <el-checkbox v-model="selectItem.isUpdateSQL">已更数据库</el-checkbox>
               <el-input type="textarea" placeholder="数据库文本" v-model="selectItem.sql"/>

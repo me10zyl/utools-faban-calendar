@@ -15,6 +15,8 @@ const show = () => {
 }
 const refreshProject = (project)=>{
     Object.assign(project, deepClone(myStorage.getOptions().projects.find(e=>e.projectName === project.projectName)))
+    dialogVisible.value = false
+    ElMessage(`已刷新${project.projectName}`)
 }
 
 defineExpose({
@@ -27,7 +29,7 @@ defineExpose({
     <el-dialog v-model="dialogVisible" title="刷新配置" width="280" height="700">
       <template #footer>
         <div style="margin-bottom: 20px">
-          <el-popconfirm :title="`确认刷新${project.selectProjectName}?`" cancel-button-text="取消" confirm-button-text="确认" @confirm="refreshProject(project)"  v-for="project in props.selectItem.projects.filter(e=>e.selectProjectName)">
+          <el-popconfirm :title="`确认刷新${project.selectProjectName}?刷新后将重置项目状态`" cancel-button-text="取消" confirm-button-text="确认" @confirm="refreshProject(project)"  v-for="project in props.selectItem.projects.filter(e=>e.selectProjectName)">
             <template #reference>
               <el-button type="primary">刷新{{project.selectProjectName}}的项目配置</el-button>
             </template>

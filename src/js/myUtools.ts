@@ -30,6 +30,7 @@ export default {
         utools.shellOpenExternal(value)
     },
     evaluateCmd(cmd:string){
-
+        // @ts-ignore
+        utools.shellOpenExternal(cmd)
     }
 }

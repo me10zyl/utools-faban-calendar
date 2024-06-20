@@ -31,6 +31,6 @@ export default {
     },
     evaluateCmd(cmd:string){
         // @ts-ignore
-        utools.shellOpenExternal(cmd)
+        window.services.exec(cmd)
     }
 }

@@ -28,5 +28,8 @@ export default {
     shellOpen(value: string){
         // @ts-ignore
         utools.shellOpenExternal(value)
+    },
+    evaluateCmd(cmd:string){
+
     }
 }

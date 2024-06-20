@@ -282,7 +282,7 @@ export default defineComponent({
               <el-button>复制分支名称</el-button>
             </div>
             <div style="margin-top: 10px;">
-              <el-button>新建分支</el-button>
+              <el-button v-if="project.newBranchCmd" @click="myUtools.evaluateCmd(project.newBranchCmd)">新建分支</el-button>
             </div>
           </el-form-item>
           <template v-if="project">
@@ -314,6 +314,9 @@ export default defineComponent({
               <el-link :href="env.envTestUrl" @click="myUtools.shellOpen(env.envTestUrl)" v-if="env.envTestUrl" target="_blank" class="link">
                 {{ env.envName }}环境地址
               </el-link>
+              <el-text @click="myUtools.evaluateCmd(env.statusCmd)" v-if="env.statusCmd">{{}}</el-text>
+              <el-button @click="myUtools.evaluateCmd(env.mergeBranchCmd)" v-if="env.mergeBranchCmd">合并分支</el-button>
+              <el-button @click="myUtools.evaluateCmd(env.publishCmd)" v-if="env.publishCmd">jenkins发布</el-button>
             </el-form-item>
             <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
               <el-row style="width: 100%">

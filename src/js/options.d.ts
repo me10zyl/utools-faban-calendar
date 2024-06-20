@@ -96,7 +96,11 @@ export interface Env {
     /**
      * jenkins地址
      */
-    jenkinsUrl: string
+    jenkinsUrl: string,
+    /**
+     * 合并代码命令
+     */
+    mergeBranchCmd?: string,
 }
 
 export interface Options {
@@ -136,10 +140,6 @@ export interface Project {
      * 新分支命令
      */
     newBranchCmd?: string,
-    /**
-     * 合并代码命令
-     */
-    mergeBranchCmd?: string,
     /**
      * git地址
      */

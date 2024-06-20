@@ -21,7 +21,6 @@ export default defineComponent({
   setup(props, {emit}) {
     const rules = reactive<FormRules<Project>>({
       projectName : [{required: true, message: '项目名称不能为空',trigger:'blur'}],
-      gitUrl: [{required: true, message: 'GIT地址不能为空',trigger:'blur'}],
       projectDesc: [{required: true, message: '项目描述不能为空',trigger:'blur'}],
     })
     const formData = reactive<Project>({

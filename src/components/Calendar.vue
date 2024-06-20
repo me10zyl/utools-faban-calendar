@@ -254,8 +254,8 @@ export default defineComponent({
         {{ selectItem.reqName || (items.filter(e => e.selected).length > 0 ? '新建需求' : '') }}
       </div>
       <el-divider class="dividers"/>
-      <div class="main">
-        <el-form :model="selectItem" v-if="selectItem.id !== ''" v-for="(project, index) in selectItem.projects">
+      <div class="main"  v-if="selectItem.id !== ''">
+        <el-form :model="selectItem" v-for="(project, index) in selectItem.projects">
           <el-divider v-if="index !== 0"/>
           <el-form-item label="需求名称" :label-width="100">
             <el-col :span="16">

@@ -49,8 +49,7 @@ export default defineComponent({
     const formEl = ref<FormInstance>()
     const rules = reactive<FormRules<Env>>({
       envName: [{required: true, message: '环境名称必填'}],
-      fabanBranchName: [{required:true, message: '发版分支名称必填'}],
-      projectPath: [{required:true, message: '本地项目路径必填'}]
+      fabanBranchName: [{required:true, message: '发版分支名称必填'}]
     })
     return {
       edit, add, del, dialogVisible, title, formData, save, formEl, rules

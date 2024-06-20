@@ -20,9 +20,13 @@ export interface DefaultOptions {
      */
     defaultCustomForms: CustomForm[],
     /**
-     *
+     * 默认环境
      */
-    defaultEnvs : Env[]
+    defaultEnvs : Env[],
+    /**
+     * 默认项目基础路径
+     */
+    defaultProjectBasePath?: string
 }
 export type CustomType = 'checkbox' | 'input' | 'button';
 export type CustomTypeLabel = '复选框' | '输入框' | '按钮'

@@ -151,7 +151,7 @@ export default defineComponent({
               </el-table-column>
             </el-table>
           </el-form-item>
-          <el-form-item label="默认环境" :label-width="100" prop="envs">
+          <el-form-item label="默认环境" :label-width="120" prop="envs">
             <el-button @click="envDialog.add()">添加环境</el-button>
             <el-table :data="formData.defaultEnvs" border style="margin-top:10px;" width="100%">
               <el-table-column prop="envName" label="环境名称" width="100"/>

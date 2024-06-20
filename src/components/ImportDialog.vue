@@ -24,19 +24,21 @@ const doImport = (importType : ImportType)=>{
       ElMessage('导入格式错误')
       return
     }
+    let type = '日历';
     try {
       if (importType === 'calendar') {
         // let calendars = myStorage.getCalendars();
         // json.forEach(e => {
         //   calendars.push(e)
         // })
-        if(json[0].reqName != undefined) {
+        if(Array.isArray(json) && json[0].reqName != undefined) {
           myStorage.saveCalendar(json)
         }else{
           ElMessage('导入格式错误')
           return
         }
       } else if (importType === 'options') {
+        type = '设置'
         // let options = myStorage.getOptions();
         // json.projects.forEach(e => {
         //   options.projects.push(e)
@@ -53,7 +55,7 @@ const doImport = (importType : ImportType)=>{
       ElMessage('导入失败')
       return
     }
-  ElMessage('导入成功')
+  ElMessage(`导入${type}成功`)
   dialogVisible.value = false
   emit('importOK')
 }
@@ -65,7 +67,10 @@ defineExpose({
 <template>
   <teleport to="body">
     <el-dialog v-model="dialogVisible" title="导入" width="600" height="700">
-      <el-input type="textarea" rows="3" v-model="importData"/>
+      <el-alert type="warning" :closable="false">
+        导入将会导致所有数据清除并覆盖
+      </el-alert>
+      <el-input type="textarea" rows="3" v-model="importData" style="margin-top: 10px"/>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>

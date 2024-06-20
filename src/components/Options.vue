@@ -117,7 +117,7 @@ export default defineComponent({
 
 <template>
   <div class="el-container">
-    <div class="el-col-12">
+    <div class="el-col-23">
       <el-link style="margin-bottom: 5px" @click="myUtools.redirect('Calendar')">←发版日历</el-link>
       <el-form style="margin-bottom: 10px" :model="formData" ref="formEl" :rules="rules" label-position="left">
         <div>项目默认配置</div>
@@ -172,7 +172,7 @@ export default defineComponent({
         <el-button type="primary" @click="addProject">新增项目</el-button>
         <el-table :data="projects" border style="margin-top:10px;" width="100%">
           <el-table-column prop="projectName" label="项目名称" width="160"/>
-          <el-table-column prop="projectDesc" label="项目描述" width="150"/>
+          <el-table-column prop="projectDesc" label="项目描述" width="300"/>
           <el-table-column label="操作">
             <template #default="scope">
               <el-button @click="editProject(scope.row)">编辑</el-button>

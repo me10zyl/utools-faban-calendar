@@ -133,9 +133,17 @@ export interface Project {
      */
     newBranchCmd?: string,
     /**
+     * 合并代码命令
+     */
+    mergeBranchCmd?: string,
+    /**
      * git地址
      */
     gitUrl?: string,
+    /**
+     * 源码基础路径
+     */
+    projectBasePath?: string,
     /**
      * 是否显示项目信息
      */

@@ -49,7 +49,19 @@ export default defineComponent({
     const formEl = ref<FormInstance>()
     const rules = reactive<FormRules<Env>>({
       envName: [{required: true, message: '环境名称必填'}],
-      fabanBranchName: [{required:true, message: '发版分支名称必填'}]
+      fabanBranchName: [{required:true, message: '发版分支名称必填'}],
+      envTestUrl: [{required:false, validator: (rule, value, callback, source, options) => {
+            if(!value){
+              return true;
+            }
+            return value.match(/^http(s)?:/).length > 0
+        }, message: '链接必须以http或https开头'}],
+      jenkinsUrl: [{required:false, validator: (rule, value, callback, source, options) => {
+          if(!value){
+            return true;
+          }
+          return value.match(/^http(s)?:/).length > 0
+        }, message: '链接必须以http或https开头'}]
     })
     return {
       edit, add, del, dialogVisible, title, formData, save, formEl, rules
@@ -66,9 +78,6 @@ export default defineComponent({
       </el-form-item>
       <el-form-item label="发版分支名称" :label-width="100" prop="fabanBranchName">
         <el-input v-model="formData.fabanBranchName"  class="el-col-12" />
-      </el-form-item>
-      <el-form-item label="本地项目路径" :label-width="100" prop="projectPath">
-        <el-input  v-model="formData.projectPath" />
       </el-form-item>
       <el-form-item label="环境测试地址"  :label-width="100" prop="envTestUrl">
         <el-input v-model="formData.envTestUrl"/>

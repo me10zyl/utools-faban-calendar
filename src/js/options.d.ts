@@ -101,6 +101,10 @@ export interface Options {
 }
 export interface Project {
     /**
+     * 选择的项目名称
+     */
+    selectProjectName: string,
+    /**
      * 分支
      */
     branch: string,

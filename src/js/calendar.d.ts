@@ -13,11 +13,7 @@ export interface Item{
     /**
      * 项目
      */
-    project: Project,
-    /**
-     * 选择的项目名称
-     */
-    selectProjectName: string,
+    projects: Project[],
     /**
      * 选择的分支
      */

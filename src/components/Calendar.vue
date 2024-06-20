@@ -2,23 +2,35 @@
 import {computed, defineComponent, nextTick, onMounted, reactive, ref, watch} from "vue";
 import {Item} from "../js/calendar";
 import myStorage from "../js/myStorage";
-import {generateRandomString, now} from "../js/util";
+import {deepClone, generateRandomString, now} from "../js/util";
 import router from '../router'
 import {ElMessage} from "element-plus";
 import myUtools from "../js/myUtools";
 import ImportDialog from "./ImportDialog.vue";
 import ExportDialog from "./ExportDialog.vue";
 import {CustomForm, Env, Project} from "../js/options";
+import RefreshDialog from "./RefreshDialog.vue";
 
 
 export default defineComponent({
-  components: {ExportDialog, ImportDialog},
+  components: {RefreshDialog, ExportDialog, ImportDialog},
   setup: (props, ctx) => {
     const items = reactive<Item[]>([])
+    const projectInit: Project = {
+      branch: "",
+      configCenterName: "",
+      customForms: [],
+      envs: [],
+      projectDesc: "",
+      projectName: "",
+      selectProjectName: "",
+      showConfigCenter: false,
+      showProjectInfo: false,
+      showSQL: false
+    }
     const init: Item = {
       id: '',
       selected: true,
-      selectProjectName: "",
       createTime: "",
       isUpdateConfigCenter: false,
       isUpdateSQL: false,
@@ -28,19 +40,9 @@ export default defineComponent({
       sql: "",
       updateConfigCenterText: "",
       status: 'normal',
-      projects: [{
-        branch: "",
-        configCenterName: "",
-        customForms: [],
-        envs: [],
-        projectDesc: "",
-        projectName: "",
-        showConfigCenter: false,
-        showProjectInfo: false,
-        showSQL: false
-      }]
+      projects: [deepClone(projectInit)]
     };
-    const dynamic = Object.assign({}, init) as Item
+    const dynamic = deepClone(init)
     const selectItem = ref<Item>(dynamic);
     const options = myStorage.getOptions();
     const deleteItem = () => {
@@ -53,7 +55,7 @@ export default defineComponent({
     }
 
     function reset() {
-      selectItem.value = Object.assign({}, init) as Item
+      selectItem.value = deepClone(init)
     }
 
     const clickNew = () => {
@@ -87,7 +89,7 @@ export default defineComponent({
       }
     })
     onMounted(() => {
-        refreshList()
+      refreshList()
     })
 
 
@@ -101,7 +103,7 @@ export default defineComponent({
         const project: Project = item.projects[i];
         const errors = [];
         if (!project.projectName) {
-          errors.push("有未选择项目")
+          errors.push("有未选择的项目")
           return errors;
         }
         if (!(item.isUpdateSQL && project.showSQL)) {
@@ -136,7 +138,7 @@ export default defineComponent({
             errors.push(stringValue)
           }
         }
-        if(errors.length > 0){
+        if (errors.length > 0) {
           for (let i = 0; i < errors.length; i++) {
             result.push(project.projectName + errors[i]);
           }
@@ -152,15 +154,16 @@ export default defineComponent({
 
     const importDialog = ref<InstanceType<typeof ImportDialog>>()
     const exportDialog = ref<InstanceType<typeof ExportDialog>>()
+    const refreshConfigDialog = ref<InstanceType<typeof RefreshDialog>>()
     const clearAll = () => {
       items.splice(0, items.length)
     }
 
-    const projectChange = (project: Project)=>{
-        Object.assign(project, options.projects.find(e=>e.projectName === project.selectProjectName))
+    const projectChange = (project: Project) => {
+      Object.assign(project, deepClone(options.projects.find(e => e.projectName === project.selectProjectName)))
     }
 
-    const refreshList = ()=>{
+    const refreshList = () => {
       const calendars = myStorage.getCalendars();
       calendars.forEach(e => {
         items.push(e)
@@ -170,6 +173,13 @@ export default defineComponent({
           clickItem(e)
         }
       })
+    }
+
+    const newProject = () => {
+      selectItem.value.projects.push(deepClone(projectInit))
+    }
+    const deleteProject = (project) => {
+      selectItem.value.projects.splice(selectItem.value.projects.indexOf(project), 1)
     }
     return {
       importDialog,
@@ -185,7 +195,11 @@ export default defineComponent({
       exportDialog,
       clearAll,
       refreshList,
-      projectChange
+      projectChange,
+      newProject,
+      deleteProject,
+      myUtools,
+      refreshConfigDialog
     }
   }
 })
@@ -209,10 +223,12 @@ export default defineComponent({
             </span>
           <template #dropdown>
             <el-dropdown-menu>
+              <el-dropdown-item @click="refreshConfigDialog.show()">刷新当前需求配置</el-dropdown-item>
               <el-dropdown-item @click="importDialog.show()">导入</el-dropdown-item>
               <el-dropdown-item @click="exportDialog.show()">导出</el-dropdown-item>
               <el-dropdown-item>
-                <el-popconfirm title="确认清空?清空后所有发版日历将无法恢复" cancel-button-text="取消" confirm-button-text="确认"
+                <el-popconfirm title="确认清空?清空后所有发版日历将无法恢复" cancel-button-text="取消"
+                               confirm-button-text="确认"
                                @confirm="clearAll">
                   <template #reference>
                     清空
@@ -239,14 +255,15 @@ export default defineComponent({
       </div>
       <el-divider class="dividers"/>
       <div class="main">
-        <el-form :model="selectItem" v-if="selectItem.id !== ''" v-for="project in selectItem.projects">
+        <el-form :model="selectItem" v-if="selectItem.id !== ''" v-for="(project, index) in selectItem.projects">
+          <el-divider v-if="index !== 0"/>
           <el-form-item label="需求名称" :label-width="100">
             <el-col :span="16">
               <el-input v-model="selectItem.reqName"/>
             </el-col>
           </el-form-item>
           <el-form-item label="选择项目" :label-width="100">
-            <el-col :span="7">
+            <el-col :span="8">
               <el-select v-model="project.selectProjectName" @change="projectChange(project)"
                          placeholder="选择项目">
                 <el-option v-for="project in options.projects"
@@ -264,7 +281,7 @@ export default defineComponent({
             <div style="margin-left: 10px">
               <el-button>复制分支名称</el-button>
             </div>
-            <div style="margin-left: 10px">
+            <div style="margin-top: 10px;">
               <el-button>新建分支</el-button>
             </div>
           </el-form-item>
@@ -290,8 +307,8 @@ export default defineComponent({
             <el-form-item :label="env.envName + '环境'" :label-width="100" v-for="env in project.envs">
               <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{ env.fabanBranchName }}分支</el-checkbox>
               <el-checkbox v-model="env.isPublished">已发版</el-checkbox>
-              <el-link :href="env.jenkinsUrl" v-if="env.jenkinsUrl" target="_blank" class="link">jenkins地址</el-link>
-              <el-link :href="env.envTestUrl" v-if="env.envTestUrl" target="_blank" class="link">
+              <el-link :href="env.jenkinsUrl" @click="myUtools.shellOpen(env.jenkinsUrl)" v-if="env.jenkinsUrl" target="_blank" class="link">jenkins地址</el-link>
+              <el-link :href="env.envTestUrl" @click="myUtools.shellOpen(env.envTestUrl)" v-if="env.envTestUrl" target="_blank" class="link">
                 {{ env.envName }}环境地址
               </el-link>
             </el-form-item>
@@ -303,18 +320,29 @@ export default defineComponent({
               </el-row>
             </el-form-item>
           </template>
+          <div style="display: flex;justify-content: right;">
+            <el-button v-if="index === selectItem.projects.length -  1" @click="newProject" type="primary">新加一个项目</el-button>
+            <el-button type="warning" @click="deleteProject(project)">移除项目
+              {{ project.selectProjectName ? project.selectProjectName : '' }}
+            </el-button>
+          </div>
         </el-form>
+        <el-divider />
         <div
             :class="{successText: true, success: selectItem.status === 'finished', error: selectItem.status !== 'finished' && selectItem.status !== 'abandon'}">
-          状态：
-          <el-badge v-for="text in checkSuccessText" type="danger">{{ text }}</el-badge>
+          <span>需求状态：</span>
+          <div v-for="text in checkSuccessText">
+            <el-tag  :type="selectItem.status === 'finished' ? 'success' : 'danger'">
+              {{ text }}
+            </el-tag>
+          </div>
         </div>
         <div style="padding-left: 20px;display: flex;align-items: center;justify-content: end">
           <div>
             <el-popconfirm title="确认删除?" cancel-button-text="取消" confirm-button-text="确认"
                            @confirm="deleteItem">
               <template #reference>
-                <el-button>删除此项目</el-button>
+                <el-button type="danger">删除此需求</el-button>
               </template>
             </el-popconfirm>
           </div>
@@ -327,6 +355,7 @@ export default defineComponent({
   </el-row>
   <ImportDialog ref="importDialog" @importOK="refreshList"/>
   <ExportDialog ref="exportDialog"/>
+  <RefreshDialog ref="refreshConfigDialog" :select-item="selectItem" />
 </template>
 
 <style scoped>
@@ -347,7 +376,7 @@ export default defineComponent({
 .left {
   background: #cccccc44;
   height: 97vh;
-  //border: 1px solid;
+//border: 1px solid;
 }
 
 .right {
@@ -376,8 +405,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   font-size: calc(var(--fontSize) - 2px);
-  //max-width: 32%;
-  //height: 37px;
+//max-width: 32%; //height: 37px;
 }
 
 .toolbox button {
@@ -414,11 +442,11 @@ export default defineComponent({
 
 .successText {
   display: flex;
-  align-items: center;
-  justify-content: end;
-  font-size: 10px;
+  flex-direction: column;
+  justify-content: start;
+  align-items: end;
   margin-bottom: 10px;
-
+  gap: 5px;
 }
 
 .error {

@@ -103,7 +103,7 @@ export interface Project {
     /**
      * 选择的项目名称
      */
-    selectProjectName: string,
+    selectProjectName?: string,
     /**
      * 分支
      */

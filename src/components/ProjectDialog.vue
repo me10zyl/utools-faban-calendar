@@ -5,6 +5,7 @@ import {FormInstance, FormItemRule, FormRules} from "element-plus";
 import {CustomForm, DefaultOptions, Project} from "../js/options";
 import myStorage from "../js/myStorage";
 import CustomFormDialog from "./CustomFormDialog.vue";
+import {deepClone} from "../js/util";
 
 
 
@@ -87,8 +88,14 @@ export default defineComponent({
     }
     const formEl = ref<FormInstance>()
     const customFormDialog = ref<InstanceType<typeof CustomFormDialog>>()
+    const coverDefaultEnv = ()=>{
+      formData.envs = myStorage.getOptions().defaultOptions.defaultEnvs
+    }
+    const coverDefaultCustomForm = ()=>{
+      formData.customForms = myStorage.getOptions().defaultOptions.defaultCustomForms
+    }
     return {
-      dialogVisible, add, del, edit, formData, title,  envDialog,  save,formEl, rules, customFormDialog
+      dialogVisible, add, del, edit, formData, title,  envDialog,  save,formEl, rules, customFormDialog, coverDefaultEnv, coverDefaultCustomForm
     }
   }
 })
@@ -124,6 +131,11 @@ export default defineComponent({
         </el-form-item>
         <el-form-item label="自定义按钮" :label-width="100" prop="customForms">
           <el-button @click="customFormDialog.add">添加自定义菜单</el-button>
+          <el-popconfirm title="此操作会覆盖默认菜单到当前项目菜单，确认覆盖?" cancel-button-text="取消" confirm-button-text="确认" @confirm="coverDefaultCustomForm">
+            <template #reference>
+              <el-button @click="">刷新默认自定义菜单</el-button>
+            </template>
+          </el-popconfirm>
           <el-table :data="formData.customForms" border style="margin-top:10px;" width="100%">
             <el-table-column prop="label" label="表单标签" width="100"/>
             <el-table-column prop="typeString" label="表单类型" width="100"/>
@@ -137,6 +149,11 @@ export default defineComponent({
         </el-form-item>
         <el-form-item label="环境" :label-width="100" prop="envs">
           <el-button @click="envDialog.add">添加环境</el-button>
+          <el-popconfirm title="此操作会覆盖默认环境到当前项目环境配置，确认覆盖?" cancel-button-text="取消" confirm-button-text="确认" @confirm="coverDefaultEnv">
+            <template #reference>
+              <el-button @click="">刷新默认环境</el-button>
+            </template>
+          </el-popconfirm>
           <el-table :data="formData.envs" border style="margin-top:10px;" width="100%">
             <el-table-column prop="envName" label="环境名称" width="100"/>
             <el-table-column prop="fabanBranchName" label="发版分支名称" width="100"/>

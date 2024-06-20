@@ -24,5 +24,9 @@ export default {
     copy(value: string) {
         // @ts-ignore
         utools.copyText(value)
+    },
+    shellOpen(value: string){
+        // @ts-ignore
+        utools.shellOpenExternal(value)
     }
 }

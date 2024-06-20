@@ -10,6 +10,11 @@ export function now(): string {
         + paddingLeft(date.getMinutes()) + ":" + paddingLeft(date.getSeconds());
 }
 
+export function deepClone<T>(source : T) : T{
+    let origin = JSON.stringify(source);
+    return JSON.parse(origin);
+}
+
 export function generateRandomString(length: number = 32) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';

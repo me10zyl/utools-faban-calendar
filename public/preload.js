@@ -1,10 +1,12 @@
+var spawn = require("child_process").spawn;
+const path = require('node:path');
+const fs = require('fs');
 utools.onPluginEnter(({code}) => {
     if(window.codeChanged) {
         console.log('windowCode')
         window.codeChanged(code)
     }
 });
-var spawn = require("child_process").spawn;
 function exec(cmd, cwd) {
     return new Promise(function(resolve, reject) {
         var result = spawn('cmd.exe', ['/s', '/c', 'cd C:\\forfaban & git clone https://gitlab.100bm.cn/zengyl/mockserver.git mockserver']);
@@ -21,17 +23,15 @@ function exec(cmd, cwd) {
         resolve();
     });
 }
-
-const fs = require('fs');
-window.writeFile = (type, content)=>{
+const writeFile = (type, basePath, content)=>{
     if(type === 'options'){
-        fs.writeFile('c:\\itaojingit\\faban\\options.txt', content, err => {
+        fs.writeFile(path.resolve(basePath, 'options.txt'), content, err => {
             if (err) {
                 console.error(err);
             }
         });
     }else{
-        fs.writeFile('c:\\itaojingit\\faban\\calendars.txt', content, err => {
+        fs.writeFile(path.resolve(basePath,'calendars.txt'), content, err => {
             if (err) {
                 console.error(err);
             }
@@ -40,9 +40,7 @@ window.writeFile = (type, content)=>{
     }
 }
 
-
-
-
 window.services = {
-    exec
+    exec,
+    writeFile
 }

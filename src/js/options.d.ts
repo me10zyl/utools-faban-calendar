@@ -26,7 +26,11 @@ export interface DefaultOptions {
     /**
      * 项目基础路径
      */
-    basePath?: string
+    basePath?: string,
+    /**
+     *
+     */
+    bakPath?: string
 }
 export type CustomType = 'checkbox' | 'input' | 'button';
 export type CustomTypeLabel = '复选框' | '输入框' | '按钮'

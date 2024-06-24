@@ -244,7 +244,7 @@ export default defineComponent({
 
 <template>
   <el-row style="margin: 0;padding: 0">
-    <el-col :span="8" class="left">
+    <el-col  class="left" >
       <div class="toolbox">
         <el-button @click="clickNew" size="small">新建</el-button>
         <el-popconfirm title="确认删除?" cancel-button-text="取消" confirm-button-text="确认" @confirm="deleteItem">
@@ -285,7 +285,7 @@ export default defineComponent({
         </li>
       </ol>
     </el-col>
-    <el-col :span="16" class="right">
+    <el-col  class="right">
       <div :class="{title:true, abandon: selectItem.status === 'abandon', success: selectItem.status === 'finished'}">
         {{ selectItem.reqName || (items.filter(e => e.selected).length > 0 ? '新建需求' : '') }}
       </div>
@@ -435,11 +435,15 @@ export default defineComponent({
 .left {
   background: #cccccc44;
   height: 97vh;
+  max-width: 32%;
+  flex: 0 0 32%;
 //border: 1px solid;
 }
 
 .right {
   height: 97vh;
+  max-width: 68%;
+  flex: 0 0 68%;
 }
 
 .list {

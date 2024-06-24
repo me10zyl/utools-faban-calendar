@@ -27,10 +27,6 @@ const doImport = (importType : ImportType)=>{
     let type = '日历';
     try {
       if (importType === 'calendar') {
-        // let calendars = myStorage.getCalendars();
-        // json.forEach(e => {
-        //   calendars.push(e)
-        // })
         if(Array.isArray(json) && json[0].reqName != undefined) {
           myStorage.saveCalendar(json)
         }else{

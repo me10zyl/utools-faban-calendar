@@ -1,6 +1,6 @@
 <script lang="ts">
-import {computed, defineComponent, nextTick, onMounted, reactive, ref, watch} from "vue";
-import {Item} from "../js/calendar";
+import {computed, defineComponent, nextTick, onMounted, onUpdated, reactive, ref, watch} from "vue";
+import {Item, SelectCustomForm, SelectEnv, SelectProject} from "../js/calendar";
 import myStorage from "../js/myStorage";
 import {deepClone, generateRandomString, now} from "../js/util";
 import router from '../router'
@@ -8,39 +8,39 @@ import {ElMessage} from "element-plus";
 import myUtools from "../js/myUtools";
 import ImportDialog from "./ImportDialog.vue";
 import ExportDialog from "./ExportDialog.vue";
-import {CustomForm, Env, Project} from "../js/options";
+import {Project} from "../js/options";
 import RefreshDialog from "./RefreshDialog.vue";
+import {basicSetup, EditorView} from "codemirror";
+import {sql} from "@codemirror/lang-sql";
+import {onRenderTriggered} from "@vue/runtime-core";
+import CodeMirror from "@/components/CodeMirror.vue";
 
 
 export default defineComponent({
-  components: {RefreshDialog, ExportDialog, ImportDialog},
+  components: {CodeMirror, RefreshDialog, ExportDialog, ImportDialog},
   setup: (props, ctx) => {
     const items = reactive<Item[]>([])
-    const projectInit: Project = {
-      branch: "",
-      configCenterName: "",
-      customForms: [],
-      envs: [],
-      projectDesc: "",
-      projectName: "",
-      selectProjectName: "",
-      showConfigCenter: false,
-      showProjectInfo: false,
-      showSQL: false
-    }
-    const init: Item = {
-      id: '',
-      selected: true,
-      createTime: "",
+    const projectInit: SelectProject = {
       isUpdateConfigCenter: false,
       isUpdateSQL: false,
       projectInfo: "",
-      reqName: "",
-      selectBranch: "",
       sql: "",
       updateConfigCenterText: "",
-      status: 'normal',
-      projects: [deepClone(projectInit)]
+      selectCustomForms: [],
+      selectEnvs: [],
+      selectProjectName: "",
+      branch: "",
+      customForms: [],
+      envs: []
+    }
+    console.log('setup.' + new Date())
+    const init: Item = {
+      createTime: "",
+      id: "",
+      projects: [deepClone(projectInit)],
+      reqName: "",
+      selected: false,
+      status: 'normal'
     };
     const dynamic = deepClone(init)
     const selectItem = ref<Item>(dynamic);
@@ -63,12 +63,16 @@ export default defineComponent({
       reset();
       selectItem.value.id = generateRandomString()
       selectItem.value.createTime = now();
+      selectItem.value.selected = true
       items.push(selectItem.value)
     }
     const clickItem = (item: Item) => {
       unSelectAll()
       item.selected = true
       selectItem.value = item
+      item.projects.forEach(p => {
+        projectChange(p)
+      })
     }
     const disableItem = () => {
       if (selectItem.value.status === 'normal') {
@@ -79,20 +83,23 @@ export default defineComponent({
         ElMessage('已完成状态不能被废弃')
       }
     }
-    watch(items, (value: Item[], oldValue, onCleanup) => {
-      myStorage.saveCalendar(items);
-      const errors = checkSuccess(selectItem.value);
-      if (errors.length === 0 && selectItem.value.status === 'normal') {
-        selectItem.value.status = 'finished'
-      } else if (errors.length > 0 && selectItem.value.status !== 'abandon') {
-        selectItem.value.status = 'normal'
-      }
-    })
+    const startWatch = () => {
+      return watch(items, (value: Item[], oldValue, onCleanup) => {
+        myStorage.saveCalendar(items);
+        const errors = checkSuccess(selectItem.value);
+        if (errors.length === 0 && selectItem.value.status === 'normal') {
+          selectItem.value.status = 'finished'
+        } else if (errors.length > 0 && selectItem.value.status !== 'abandon') {
+          selectItem.value.status = 'normal'
+        }
+      });
+    }
+
+    const watchRef = startWatch()
+
     onMounted(() => {
       refreshList()
     })
-
-
     const goToSettings = () => {
       myUtools.redirect("Options")
     }
@@ -100,22 +107,22 @@ export default defineComponent({
     function checkSuccess(item: Item): string[] {
       const result = []
       for (let i in item.projects) {
-        const project: Project = item.projects[i];
+        const project: SelectProject = item.projects[i];
         const errors = [];
         if (!project.projectName) {
           errors.push("有未选择的项目")
           return errors;
         }
-        if (!(item.isUpdateSQL && project.showSQL)) {
+        if (!(project.isUpdateSQL && project.showSQL)) {
           errors.push("未执行SQL")
         }
-        if (!(item.isUpdateConfigCenter && item.isUpdateConfigCenter)) {
+        if (!(project.isUpdateConfigCenter && project.isUpdateConfigCenter)) {
           errors.push("未修改配置中心配置")
         }
-        if (project.envs.length > 0) {
+        if (project.selectEnvs.length > 0) {
           let strings1 = [];
           let strings2 = []
-          project.envs.filter(e => !e.isPublished || !e.isMergedFabanBranch).forEach(e => {
+          project.selectEnvs.filter(e => !e.isPublished || !e.isMergedFabanBranch).forEach(e => {
             if (!e.isPublished) {
               strings1.push(e.envName)
             }
@@ -130,8 +137,8 @@ export default defineComponent({
             errors.push('未发布' + strings1.join(',') + '环境')
           }
         }
-        if (project.customForms.length > 0) {
-          let stringValue = project.customForms.filter(e => e.type === 'checkbox' && !(e.value)).map(e => {
+        if (project.selectCustomForms.length > 0) {
+          let stringValue = project.selectCustomForms.filter(e => e.type === 'checkbox' && !(e.value)).map(e => {
             return "未勾选" + e.label;
           }).join(",");
           if (stringValue) {
@@ -159,12 +166,41 @@ export default defineComponent({
       items.splice(0, items.length)
     }
 
-    const projectChange = (project: Project) => {
-      Object.assign(project, deepClone(options.projects.find(e => e.projectName === project.selectProjectName)))
+    const projectChange = (project: SelectProject) => {
+      Object.assign(project, options.projects.find(e => e.projectName === project.selectProjectName));
+      if (project.envs) {
+        project.envs.forEach((e, index) => {
+          if (project.selectEnvs && index in project.selectEnvs) {
+            Object.assign(project.selectEnvs[index], e)
+          } else {
+            const selectEnv: SelectEnv = {
+              selectEnvName: e.envName
+            }
+            project.selectEnvs.push(Object.assign(selectEnv, e))
+          }
+        })
+      }
+      if (project.customForms) {
+        project.customForms.forEach((e, index) => {
+          if (project.selectCustomForms && index in project?.selectCustomForms) {
+            Object.assign(project.selectCustomForms[index], e)
+          } else {
+            const select: SelectCustomForm = {
+              selectLabel: e.label,
+              value: undefined
+            }
+            project.selectCustomForms.push(Object.assign(select, e))
+          }
+        })
+      }
     }
 
+
     const refreshList = () => {
+      watchRef()
+      items.splice(0, items.length)
       const calendars = myStorage.getCalendars();
+      startWatch()
       calendars.forEach(e => {
         items.push(e)
       });
@@ -181,6 +217,7 @@ export default defineComponent({
     const deleteProject = (project) => {
       selectItem.value.projects.splice(selectItem.value.projects.indexOf(project), 1)
     }
+
     return {
       importDialog,
       items,
@@ -223,7 +260,6 @@ export default defineComponent({
             </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="refreshConfigDialog.show()">刷新当前需求配置</el-dropdown-item>
               <el-dropdown-item @click="importDialog.show()">导入</el-dropdown-item>
               <el-dropdown-item @click="exportDialog.show()">导出</el-dropdown-item>
               <el-dropdown-item>
@@ -254,91 +290,108 @@ export default defineComponent({
         {{ selectItem.reqName || (items.filter(e => e.selected).length > 0 ? '新建需求' : '') }}
       </div>
       <el-divider class="dividers"/>
-      <div class="main"  v-if="selectItem.id !== ''">
-        <el-form :model="selectItem" v-for="(project, index) in selectItem.projects">
-          <el-divider v-if="index !== 0"/>
+      <div class="main" v-if="selectItem.id !== ''">
+        <el-form :model="selectItem">
           <el-form-item label="需求名称" :label-width="100">
             <el-col :span="16">
               <el-input v-model="selectItem.reqName"/>
             </el-col>
           </el-form-item>
-          <el-form-item label="选择项目" :label-width="100">
-            <el-col :span="8">
-              <el-select v-model="project.selectProjectName" @change="projectChange(project)"
-                         placeholder="选择项目">
-                <el-option v-for="project in options.projects"
-                           :key="project.projectName"
-                           :label="project.projectName"
-                           :value="project.projectName"
-                >
-                </el-option>
-              </el-select>
-            </el-col>
-            <div style="margin-left: 10px">
-              <el-input v-model="project.branch" placeholder="填写本需求新建的分支"
-                        v-if="project"/>
-            </div>
-            <div style="margin-left: 10px">
-              <el-button>复制分支名称</el-button>
-            </div>
-            <div style="margin-top: 10px;">
-              <el-button v-if="project.newBranchCmd" @click="myUtools.evaluateCmd(project.newBranchCmd)">新建分支</el-button>
-            </div>
-          </el-form-item>
-          <template v-if="project">
+          <template v-for="(project, index) in selectItem.projects">
+            <el-divider v-if="index !== 0"/>
+            <el-form-item label="选择项目" :label-width="100">
+              <el-col :span="8">
+                <el-select v-model="project.selectProjectName" @change="projectChange(project)"
+                           placeholder="选择项目">
+                  <el-option v-for="project in options.projects"
+                             :key="project.projectName"
+                             :label="project.projectName"
+                             :value="project.projectName"
+                  >
+                  </el-option>
+                </el-select>
+              </el-col>
+              <div style="margin-left: 10px">
+                <el-input v-model="project.branch" placeholder="填写本需求新建的分支"
+                          v-if="project"/>
+              </div>
+              <div style="margin-left: 10px">
+                <el-button>复制分支名称</el-button>
+              </div>
+              <div style="margin-top: 10px;">
+                <el-button v-if="project.newBranchCmd"
+                           @click="myUtools.evaluateCmd(project.newBranchCmd)">新建分支
+                </el-button>
+              </div>
+            </el-form-item>
+
             <div style="margin-bottom: 18px;padding-left: 100px">
-              <el-text>{{project.projectDesc}}</el-text>
+              <el-text>{{ project.projectDesc }}</el-text>
             </div>
             <el-form-item :label-width="100" v-if="project.showSQL">
-              <el-checkbox v-model="selectItem.isUpdateSQL">已更数据库</el-checkbox>
-              <el-input type="textarea" placeholder="数据库文本" v-model="selectItem.sql"/>
+              <el-checkbox v-model="project.isUpdateSQL">已更数据库</el-checkbox>
+              <!--              <el-input type="textarea" placeholder="数据库文本" v-model="selectItem.sql"/>-->
+              <CodeMirror v-model="project.sql"/>
             </el-form-item>
             <el-form-item :label="project.configCenterName + '配置'" :label-width="100"
                           v-if="project.showConfigCenter">
-              <el-checkbox v-model="selectItem.isUpdateConfigCenter">
+              <el-checkbox v-model="project.isUpdateConfigCenter">
                 已更新{{ project.configCenterName }}配置
               </el-checkbox>
               <el-input type="textarea" :placeholder="project.configCenterName + '配置'"
-                        v-model="selectItem.updateConfigCenterText"/>
+                        v-model="project.updateConfigCenterText"/>
             </el-form-item>
             <el-form-item :label="customForm.label" :label-width="100"
-                          v-for="customForm in project.customForms">
+                          v-for="(customForm, index) in project.selectCustomForms">
               <el-button v-if="customForm.type === 'button'" v-model="customForm.value"></el-button>
-              <el-checkbox v-if="customForm.type === 'checkbox'" v-model="customForm.value"></el-checkbox>
+              <el-checkbox v-if="customForm.type === 'checkbox'"
+                           v-model="customForm.value"></el-checkbox>
               <el-input v-if="customForm.type === 'input'" v-model="customForm.value"/>
             </el-form-item>
-            <el-form-item :label="env.envName + '环境'" :label-width="100" v-for="env in project.envs">
-              <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{ env.fabanBranchName }}分支</el-checkbox>
+            <el-form-item :label="env.envName + '环境'" :label-width="100"
+                          v-for="(env, index) in project.selectEnvs">
+              <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{
+                  env.fabanBranchName
+                }}分支
+              </el-checkbox>
               <el-checkbox v-model="env.isPublished">已发版</el-checkbox>
-              <el-link :href="env.jenkinsUrl" @click="myUtools.shellOpen(env.jenkinsUrl)" v-if="env.jenkinsUrl" target="_blank" class="link">jenkins地址</el-link>
-              <el-link :href="env.envTestUrl" @click="myUtools.shellOpen(env.envTestUrl)" v-if="env.envTestUrl" target="_blank" class="link">
+              <el-link :href="env.jenkinsUrl" @click="myUtools.shellOpen(env.jenkinsUrl)" v-if="env.jenkinsUrl"
+                       target="_blank" class="link">jenkins地址
+              </el-link>
+              <el-link :href="env.envTestUrl" @click="myUtools.shellOpen(env.envTestUrl)" v-if="env.envTestUrl"
+                       target="_blank" class="link">
                 {{ env.envName }}环境地址
               </el-link>
               <el-text @click="myUtools.evaluateCmd(env.statusCmd)" v-if="env.statusCmd">{{}}</el-text>
-              <el-button @click="myUtools.evaluateCmd(env.mergeBranchCmd)" v-if="env.mergeBranchCmd">合并分支</el-button>
+              <el-button @click="myUtools.evaluateCmd(env.mergeBranchCmd)" v-if="env.mergeBranchCmd">合并分支
+              </el-button>
               <el-button @click="myUtools.evaluateCmd(env.publishCmd)" v-if="env.publishCmd">jenkins发布</el-button>
             </el-form-item>
             <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
               <el-row style="width: 100%">
                 <el-col :span="15">
-                  <el-input type="textarea" v-model="selectItem.projectInfo" :rows="5"/>
+                  <el-input type="textarea" v-model="project.projectInfo" :rows="5"/>
                 </el-col>
               </el-row>
             </el-form-item>
+            <div style="display: flex;justify-content: right;">
+              <el-button type="warning" @click="deleteProject(project)">移除项目
+                {{ project.selectProjectName ? project.selectProjectName : '' }}
+              </el-button>
+            </div>
           </template>
-          <div style="display: flex;justify-content: right;">
-            <el-button v-if="index === selectItem.projects.length -  1" @click="newProject" type="primary">新加一个项目</el-button>
-            <el-button type="warning" @click="deleteProject(project)">移除项目
-              {{ project.selectProjectName ? project.selectProjectName : '' }}
+          <div style="display: flex;justify-content: right;margin-top: 15px">
+            <el-button @click="newProject" type="primary">
+              新加一个项目
             </el-button>
           </div>
         </el-form>
-        <el-divider />
+        <el-divider/>
         <div
             :class="{successText: true, success: selectItem.status === 'finished', error: selectItem.status !== 'finished' && selectItem.status !== 'abandon'}">
           <span>需求状态：</span>
           <div v-for="text in checkSuccessText">
-            <el-tag  :type="selectItem.status === 'finished' ? 'success' : 'danger'">
+            <el-tag :type="selectItem.status === 'finished' ? 'success' : 'danger'">
               {{ text }}
             </el-tag>
           </div>
@@ -361,7 +414,7 @@ export default defineComponent({
   </el-row>
   <ImportDialog ref="importDialog" @importOK="refreshList"/>
   <ExportDialog ref="exportDialog"/>
-  <RefreshDialog ref="refreshConfigDialog" :select-item="selectItem" />
+  <RefreshDialog ref="refreshConfigDialog" :select-item="selectItem"/>
 </template>
 
 <style scoped>
@@ -453,6 +506,10 @@ export default defineComponent({
   align-items: end;
   margin-bottom: 10px;
   gap: 5px;
+}
+
+.CodeMirror-lines {
+  min-height: 200px;
 }
 
 .error {

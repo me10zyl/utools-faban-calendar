@@ -1,23 +1,23 @@
-import {Project} from "./options";
+import {CustomForm, Env, Project} from "./options";
 
 export type Status = 'normal' | 'abandon' | 'finished'
-export interface Item{
+export interface SelectProject extends Partial<Project>{
     /**
-     * guid
+     * 选择的项目名称
      */
-    id: string,
+    selectProjectName: string,
     /**
-     * 需求名称
+     * 分支
      */
-    reqName: string,
+    branch: string,
     /**
-     * 项目
+     * 环境
      */
-    projects: Project[],
+    selectEnvs: SelectEnv[],
     /**
-     * 选择的分支
+     * 自定义表单
      */
-    selectBranch:  string,
+    selectCustomForms: SelectCustomForm[],
     /**
      * SQL
      */
@@ -38,6 +38,38 @@ export interface Item{
      * 项目信息
      */
     projectInfo: string,
+}
+export interface SelectCustomForm extends Partial<CustomForm>{
+    selectLabel: string
+    value: string|boolean
+}
+export interface SelectEnv extends Partial<Env>{
+    /**
+     * 环境名称
+     */
+    selectEnvName:  string
+    /**
+     * 是否已发布
+     */
+    isPublished?: boolean,
+    /**
+     * 是否已合并到发版分支
+     */
+    isMergedFabanBranch?: boolean,
+}
+export interface Item{
+    /**
+     * guid
+     */
+    id: string,
+    /**
+     * 需求名称
+     */
+    reqName: string,
+    /**
+     * 项目
+     */
+    projects: SelectProject[],
     /**
      * 创建时间
      */

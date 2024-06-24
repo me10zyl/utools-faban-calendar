@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@codemirror/lang-sql": "^6.7.0",
     "codemirror": "^6.0.1",
     "element-plus": "^2.7.5",
     "vue": "^3.4.21",

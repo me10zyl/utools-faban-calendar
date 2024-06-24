@@ -48,23 +48,16 @@ export interface CustomForm {
      * 标签
      */
     label: string,
-    typeString: string,
-    value?: string|boolean
+    /**
+     * 类型的中文文本
+     */
+    typeString: string
 }
-
 export interface Env {
     /**
      * 环境名称
      */
     envName: string,
-    /**
-     * 是否已发布
-     */
-    isPublished: boolean,
-    /**
-     * 是否已合并到发版分支
-     */
-    isMergedFabanBranch: boolean,
     /**
      * 发版分支名称
      */
@@ -112,14 +105,6 @@ export interface Options {
     projects: Project[]
 }
 export interface Project {
-    /**
-     * 选择的项目名称
-     */
-    selectProjectName?: string,
-    /**
-     * 分支
-     */
-    branch: string,
     /**
      * 项目名称
      */

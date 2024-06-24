@@ -13,7 +13,13 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const formData: Env = <Env>reactive({})
+    const formData: Env =reactive <Env>({
+      envName: "",
+      envTestUrl: "",
+      fabanBranchName: "",
+      jenkinsUrl: "",
+      startTime: ""
+    })
     let editObject = null;
     const edit = (row) => {
       dialogVisible.value = true;

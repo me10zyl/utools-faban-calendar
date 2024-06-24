@@ -164,6 +164,9 @@ export default defineComponent({
               </el-table-column>
             </el-table>
           </el-form-item>
+          <el-form-item label="项目基础路径" :label-width="120" prop="basePath">
+            <el-input v-model="formData.basePath"/>
+          </el-form-item>
         </div>
       </el-form>
       <div>

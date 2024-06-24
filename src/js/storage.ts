@@ -1,17 +1,21 @@
 function setItem(key: string, value: Object):void
 function setItem(key: string, value: string):void {
     if (typeof value === 'string') {
-        localStorage.setItem(key, value)
+        // @ts-ignore
+        utools.dbStorage.setItem(key, value)
     } else {
         let jsonString = JSON.stringify(value);
-        localStorage.setItem(key, jsonString)
+        // @ts-ignore
+        utools.dbStorage.setItem(key, jsonString)
     }
 }
 function getItem(key: string): string {
-    return localStorage.getItem(key)
+    // @ts-ignore
+    return utools.dbStorage.getItem(key)
 }
 function getItemObject<T>(key: string): T {
-    let item = localStorage.getItem(key);
+    // @ts-ignore
+    let item = utools.dbStorage.getItem(key);
     if(item == null){
         return null;
     }

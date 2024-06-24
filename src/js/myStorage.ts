@@ -6,6 +6,8 @@ import {Item} from "./calendar";
 export default {
     saveOptions(options: Options): void {
         storage.setItem('faban-calendar-options', options)
+        //@ts-ignore
+        window.writeFile('options', JSON.stringify(options))
     },
     getOptions(): Options {
         let opts = storage.getItemObject<Options>('faban-calendar-options');
@@ -24,6 +26,8 @@ export default {
         //     item.
         // }
         storage.setItem('faban-calendar-calendars', items)
+        //@ts-ignore
+        window.writeFile('calendars', JSON.stringify(items))
     },
     getCalendars(): Item[]{
         let itemObject = storage.getItemObject<Item[]>('faban-calendar-calendars');

@@ -24,9 +24,9 @@ export interface DefaultOptions {
      */
     defaultEnvs : Env[],
     /**
-     * 默认项目基础路径
+     * 项目基础路径
      */
-    defaultProjectBasePath?: string
+    basePath?: string
 }
 export type CustomType = 'checkbox' | 'input' | 'button';
 export type CustomTypeLabel = '复选框' | '输入框' | '按钮'

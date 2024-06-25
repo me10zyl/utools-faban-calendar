@@ -320,7 +320,9 @@ export default defineComponent({
               </div>
               <div style="margin-top: 10px;">
                 <el-button v-if="project.newBranchCmd"
-                           @click="myUtools.evaluateCmd(project.newBranchCmd)">新建分支
+                           @click="myUtools.evaluateCmd(project.newBranchCmd, {
+                              project: project
+                           })">新建分支
                 </el-button>
               </div>
             </el-form-item>

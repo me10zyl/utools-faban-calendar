@@ -1,7 +1,7 @@
 @echo off
-cd {{basePath} || goto :error
+cd {{basePath}} || goto :error
 if not exist {{projectName}} (
-    git clone {{gitUrl}} || goto :error
+    git clone {{gitUrl}} {{projectName}} || goto :error
 )
 cd {{projectName}} || goto :error
 git branch {{branch}} origin/{{releaseBranch}} || goto :error

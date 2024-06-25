@@ -1,16 +1,16 @@
 var spawn = require("child_process").spawn;
 const path = require('node:path');
 const fs = require('fs');
+const os = require('os');
 utools.onPluginEnter(({code}) => {
     if(window.codeChanged) {
         console.log('windowCode')
         window.codeChanged(code)
     }
 });
-function exec(cmdPath, callback) {
+function exec(cmdContent, callback) {
     const tempFilePath = path.join(os.tmpdir(), `utools_temp_script_${+new Date()}.bat`);
-    const data = fs.readFileSync(cmdPath, { encoding: 'utf8', flag: 'r' });
-    fs.writeFileSync(tempFilePath, window.replaceVars(data));
+    fs.writeFileSync(tempFilePath, cmdContent);
     let result = spawn('cmd.exe', ['/S','/C', tempFilePath]);
     let response = false;
     result.on('close', function (code) {

@@ -1,6 +1,12 @@
 import {Router} from "vue-router";
+import {SelectProject} from "./calendar";
+import myStorage from "./myStorage";
+import {ElMessage} from "element-plus";
 
 type To = 'Options' | 'Calendar'
+type CmdVars = {
+    project? : SelectProject
+}
 export default {
     init: function (router: Router) {
         // @ts-ignore
@@ -29,9 +35,29 @@ export default {
         // @ts-ignore
         utools.shellOpenExternal(value)
     },
-    evaluateCmd(cmd:string){
+    evaluateCmd(cmd:string, vars?:CmdVars){
+        let options = myStorage.getOptions();
+        if(!options.defaultOptions.basePath || options.defaultOptions.basePath.trim() === ''){
+            ElMessage('全局配置-项目基础路径不能为空')
+            return
+        }
+        for(let key in options.defaultOptions){
+            //@ts-ignore
+            cmd = cmd.replaceAll(`{{${key}}}`,options.defaultOptions[key])
+        }
+        if(vars) {
+            if (vars.project) {
+                for(let key in vars.project){
+                    //@ts-ignore
+                    cmd = cmd.replaceAll(`{{${key}}}`,vars.project[key])
+                }
+            }
+        }
+        console.log('exec', cmd)
         // @ts-ignore
-        window.services.exec(cmd)
+        window.services.exec(cmd, (e)=>{
+            console.log(e.type + ":",e.data)
+        })
     },
     isDev():string{
         // @ts-ignore

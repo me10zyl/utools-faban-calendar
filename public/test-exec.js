@@ -1,16 +1,16 @@
-var spawn = require("child_process").spawn;
+let spawn = require("child_process").spawn;
 const path = require('node:path');
 const fs = require('fs');
-utools.onPluginEnter(({code}) => {
-    if(window.codeChanged) {
-        console.log('windowCode')
-        window.codeChanged(code)
-    }
-});
+const os = require('os');
+
+function replaceVars(data) {
+    return data;
+}
+
 function exec(cmdPath, callback) {
     const tempFilePath = path.join(os.tmpdir(), `utools_temp_script_${+new Date()}.bat`);
     const data = fs.readFileSync(cmdPath, { encoding: 'utf8', flag: 'r' });
-    fs.writeFileSync(tempFilePath, window.replaceVars(data));
+    fs.writeFileSync(tempFilePath, replaceVars(data));
     let result = spawn('cmd.exe', ['/S','/C', tempFilePath]);
     let response = false;
     result.on('close', function (code) {
@@ -39,28 +39,7 @@ function exec(cmdPath, callback) {
         });
     });
 }
-const writeFile = (type, basePath, content)=>{
-    if(type === 'options'){
-        fs.writeFile(path.resolve(basePath, 'options.txt'), content, err => {
-            if (err) {
-                console.error(err);
-            }
-        });
-    }else{
-        fs.writeFile(path.resolve(basePath,'calendars.txt'), content, err => {
-            if (err) {
-                console.error(err);
-            }
-        });
 
-    }
-}
-const readFile = (path)=>{
-    return fs.readFileSync(path, { encoding: 'utf8', flag: 'r' }).toString();
-}
-
-window.services = {
-    exec,
-    writeFile,
-    readFile
-}
+exec('c:\\forfaban-script\\merge.bat', (e)=>{
+    console.log(e.type + ":",e.data)
+})

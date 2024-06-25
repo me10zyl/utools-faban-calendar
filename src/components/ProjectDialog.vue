@@ -6,6 +6,8 @@ import {CustomForm, DefaultOptions, Project} from "../js/options";
 import myStorage from "../js/myStorage";
 import CustomFormDialog from "./CustomFormDialog.vue";
 import {deepClone} from "../js/util";
+import CodeMirror from "@/components/CodeMirror.vue";
+import myUtools from "@/js/myUtools";
 
 
 
@@ -17,7 +19,7 @@ export default defineComponent({
     }
   },
   emits : ['update:projects', 'save'],
-  components: {CustomFormDialog, EnvDialog},
+  components: {CodeMirror, CustomFormDialog, EnvDialog},
   setup(props, {emit}) {
     const rules = reactive<FormRules<Project>>({
       projectName : [{required: true, message: '项目名称不能为空',trigger:'blur'}],
@@ -35,6 +37,24 @@ export default defineComponent({
       customForms: [],
       showProjectInfo: true
     })
+    if(myUtools.isDev()) {
+      formData.newBranchCmd = myUtools.readFile('C:\\itaojingit\\faban-calendar\\public\\scripts\\new-branch.bat')
+    }else{
+      formData.newBranchCmd = "@echo off\n" +
+          "cd C:\\forfaban || goto :error\n" +
+          "if  not exist mockserver-dev (\n" +
+          "    git clone https://gitlab.100bm.cn/zengyl/mockserver mockserver-dev || goto :error\n" +
+          ")\n" +
+          "cd mockserver-dev || goto :error\n" +
+          "git branch abc origin/master || goto :error\n" +
+          "git push -u origin abc || goto :error\n" +
+          "goto :end\n" +
+          ":error\n" +
+          "echo A command failed. Exiting script.\n" +
+          "exit /b 1\n" +
+          ":end\n" +
+          "echo Script finished successfully."
+    }
     const dialogVisible = ref<boolean>(false)
     const title = ref<string>('新增项目')
 
@@ -122,7 +142,8 @@ export default defineComponent({
           <el-input type="textarea" v-model="formData.projectDesc"/>
         </el-form-item>
         <el-form-item label="新分支命令" :label-width="100" prop="newBranchCmd">
-          <el-input  v-model="formData.newBranchCmd" type="textarea"/>
+<!--          <el-input  v-model="formData.newBranchCmd" type="textarea"/>-->
+          <code-mirror v-model="formData.newBranchCmd" lang="batch"></code-mirror>
         </el-form-item>
         <el-form-item label="git地址" :label-width="100" prop="gitUrl">
           <el-input  v-model="formData.gitUrl"/>

@@ -331,7 +331,7 @@ export default defineComponent({
             <el-form-item :label-width="100" v-if="project.showSQL">
               <el-checkbox v-model="project.isUpdateSQL">已更数据库</el-checkbox>
               <!--              <el-input type="textarea" placeholder="数据库文本" v-model="selectItem.sql"/>-->
-              <CodeMirror v-model="project.sql"/>
+              <CodeMirror v-model="project.sql" lang="sql"/>
             </el-form-item>
             <el-form-item :label="project.configCenterName + '配置'" :label-width="100"
                           v-if="project.showConfigCenter">

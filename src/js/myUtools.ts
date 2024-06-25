@@ -32,5 +32,13 @@ export default {
     evaluateCmd(cmd:string){
         // @ts-ignore
         window.services.exec(cmd)
+    },
+    isDev():string{
+        // @ts-ignore
+        return utools.isDev();
+    },
+    readFile(path):string{
+        // @ts-ignore
+        return window.services.readFile(path)
     }
 }

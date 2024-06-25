@@ -55,8 +55,8 @@ const writeFile = (type, basePath, content)=>{
 
     }
 }
-const readFile = (path)=>{
-    return fs.readFileSync(path, { encoding: 'utf8', flag: 'r' }).toString();
+const readFile = (path1)=>{
+    return fs.readFileSync(path.join(__dirname, path1), { encoding: 'utf8', flag: 'r' }).toString();
 }
 
 window.services = {

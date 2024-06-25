@@ -1,11 +1,11 @@
 @echo off
-cd C:\forfaban || goto :error
-if  not exist mockserver-dev (
-    git clone https://gitlab.100bm.cn/zengyl/mockserver mockserver-dev || goto :error
+cd {{basePath} || goto :error
+if not exist {{projectName}} (
+    git clone {{gitUrl}} || goto :error
 )
-cd mockserver-dev || goto :error
-git branch abc origin/master || goto :error
-git push -u origin abc || goto :error
+cd {{projectName}} || goto :error
+git branch {{branch}} origin/{{releaseBranch}} || goto :error
+git push -u origin {{branch}} || goto :error
 goto :end
 :error
 echo A command failed. Exiting script.

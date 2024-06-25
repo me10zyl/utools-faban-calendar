@@ -134,9 +134,9 @@ export interface Project {
      */
     gitUrl?: string,
     /**
-     * 源码基础路径
+     * 正式环境分支
      */
-    projectBasePath?: string,
+    releaseBranch?: string
     /**
      * 是否显示项目信息
      */

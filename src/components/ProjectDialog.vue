@@ -8,9 +8,6 @@ import CustomFormDialog from "./CustomFormDialog.vue";
 import {deepClone} from "../js/util";
 import CodeMirror from "@/components/CodeMirror.vue";
 import myUtools from "@/js/myUtools";
-
-
-
 export default defineComponent({
   props: {
     projects : {
@@ -24,37 +21,27 @@ export default defineComponent({
     const rules = reactive<FormRules<Project>>({
       projectName : [{required: true, message: '项目名称不能为空',trigger:'blur'}],
       projectDesc: [{required: true, message: '项目描述不能为空',trigger:'blur'}],
+      releaseBranch: [{message: '发布分支脚本不为空时必填', validator: rule => {
+        debugger
+          return formData.newBranchCmd == '' || (!!formData.releaseBranch && formData.releaseBranch.trim() !== '')
+        }, trigger: 'blur'}],
+      gitUrl: [{message: '发布分支脚本不为空时必填', validator: rule => {
+          return formData.newBranchCmd == '' || (!!formData.gitUrl && formData.gitUrl.trim() !== '')
+        }, trigger: 'blur'}]
     })
-    const formData = reactive<Project>({
+    let init = {
       configCenterName: "",
       envs: [],
       gitUrl: "",
-      newBranchCmd: "",
+      newBranchCmd: myUtools.readFile('scripts/new-branch.bat'),
       projectDesc: "",
       projectName: "",
       showConfigCenter: true,
       showSQL: true,
       customForms: [],
       showProjectInfo: true
-    })
-    if(myUtools.isDev()) {
-      formData.newBranchCmd = myUtools.readFile('C:\\itaojingit\\faban-calendar\\public\\scripts\\new-branch.bat')
-    }else{
-      formData.newBranchCmd = "@echo off\n" +
-          "cd C:\\forfaban || goto :error\n" +
-          "if  not exist mockserver-dev (\n" +
-          "    git clone https://gitlab.100bm.cn/zengyl/mockserver mockserver-dev || goto :error\n" +
-          ")\n" +
-          "cd mockserver-dev || goto :error\n" +
-          "git branch abc origin/master || goto :error\n" +
-          "git push -u origin abc || goto :error\n" +
-          "goto :end\n" +
-          ":error\n" +
-          "echo A command failed. Exiting script.\n" +
-          "exit /b 1\n" +
-          ":end\n" +
-          "echo Script finished successfully."
-    }
+    };
+    const formData = reactive<Project>(deepClone(init))
     const dialogVisible = ref<boolean>(false)
     const title = ref<string>('新增项目')
 
@@ -71,8 +58,12 @@ export default defineComponent({
     const add = ()=>{
       dialogVisible.value = true
       title.value = '新增项目'
-      if(formEl.value) {
+      /*if(formEl.value) {
         formEl.value.resetFields()
+      }*/
+      let init1 = deepClone(init);
+      for(let key in formData){
+        formData[key] = init1[key];
       }
       setDefaults(formData)
       editObject = null
@@ -141,12 +132,15 @@ export default defineComponent({
         <el-form-item label="项目描述" :label-width="100" prop="projectDesc">
           <el-input type="textarea" v-model="formData.projectDesc"/>
         </el-form-item>
+        <el-form-item label="git地址" :label-width="100" prop="gitUrl">
+          <el-input  v-model="formData.gitUrl"/>
+        </el-form-item>
+        <el-form-item label="正式环境分支" :label-width="100" prop="releaseBranch" class="el-col-12">
+          <el-input  v-model="formData.releaseBranch"/>
+        </el-form-item>
         <el-form-item label="新分支命令" :label-width="100" prop="newBranchCmd">
 <!--          <el-input  v-model="formData.newBranchCmd" type="textarea"/>-->
           <code-mirror v-model="formData.newBranchCmd" lang="batch"></code-mirror>
-        </el-form-item>
-        <el-form-item label="git地址" :label-width="100" prop="gitUrl">
-          <el-input  v-model="formData.gitUrl"/>
         </el-form-item>
         <el-form-item label="自定义按钮" :label-width="100" prop="customForms">
           <el-button @click="customFormDialog.add">添加自定义菜单</el-button>

@@ -1,6 +1,15 @@
 import {CustomForm, Env, Project} from "./options";
 
 export type Status = 'normal' | 'abandon' | 'finished'
+
+export interface Command{
+    commands : CommandItem[],
+    exitCode : number
+}
+export interface CommandItem{
+    type: 'stdout' | 'stderr',
+    text: string
+}
 export interface SelectProject extends Partial<Project>{
     /**
      * 选择的项目名称

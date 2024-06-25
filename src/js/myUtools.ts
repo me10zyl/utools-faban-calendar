@@ -4,7 +4,7 @@ import myStorage from "./myStorage";
 import {ElMessage} from "element-plus";
 
 type To = 'Options' | 'Calendar'
-type CmdVars = {
+export type CmdVars = {
     project? : SelectProject
 }
 export default {
@@ -35,7 +35,7 @@ export default {
         // @ts-ignore
         utools.shellOpenExternal(value)
     },
-    evaluateCmd(cmd:string, vars?:CmdVars){
+    evaluateCmd(cmd:string, vars?:CmdVars, callback?: Function){
         let options = myStorage.getOptions();
         if(!options.defaultOptions.basePath || options.defaultOptions.basePath.trim() === ''){
             ElMessage('全局配置-项目基础路径不能为空')
@@ -55,9 +55,7 @@ export default {
         }
         console.log('exec', cmd)
         // @ts-ignore
-        window.services.exec(cmd, (e)=>{
-            console.log(e.type + ":",e.data)
-        })
+        window.services.exec(cmd, callback)
     },
     isDev():string{
         // @ts-ignore

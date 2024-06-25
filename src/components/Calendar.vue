@@ -1,11 +1,11 @@
 <script lang="ts">
 import {computed, defineComponent, nextTick, onMounted, onUpdated, reactive, ref, watch} from "vue";
-import {Item, SelectCustomForm, SelectEnv, SelectProject} from "../js/calendar";
+import {Command, CommandItem, Item, SelectCustomForm, SelectEnv, SelectProject} from "../js/calendar";
 import myStorage from "../js/myStorage";
 import {deepClone, generateRandomString, now} from "../js/util";
 import router from '../router'
 import {ElMessage} from "element-plus";
-import myUtools from "../js/myUtools";
+import myUtools, {CmdVars} from "../js/myUtools";
 import ImportDialog from "./ImportDialog.vue";
 import ExportDialog from "./ExportDialog.vue";
 import {Project} from "../js/options";
@@ -14,10 +14,11 @@ import {basicSetup, EditorView} from "codemirror";
 import {sql} from "@codemirror/lang-sql";
 import {onRenderTriggered} from "@vue/runtime-core";
 import CodeMirror from "@/components/CodeMirror.vue";
+import CommandDialog from "@/components/CommandDialog.vue";
 
 
 export default defineComponent({
-  components: {CodeMirror, RefreshDialog, ExportDialog, ImportDialog},
+  components: {CommandDialog, CodeMirror, RefreshDialog, ExportDialog, ImportDialog},
   setup: (props, ctx) => {
     const items = reactive<Item[]>([])
     const projectInit: SelectProject = {
@@ -217,6 +218,27 @@ export default defineComponent({
     const deleteProject = (project) => {
       selectItem.value.projects.splice(selectItem.value.projects.indexOf(project), 1)
     }
+    const exec = (cmd: string, vars: CmdVars): void =>{
+      execResult.value.commands.splice(0, execResult.value.commands.length)
+      commandDialog.value.show()
+      myUtools.evaluateCmd(cmd, vars, (e)=>{
+        console.log(e.type + ":",e.data)
+        if(e.type === 'finished') {
+          execResult.value.exitCode = e.data
+        }else{
+          execResult.value.commands.push({
+            type: e.type,
+            text: e.data
+          })
+        }
+      })
+    }
+
+    const execResult = ref<Command>({
+      commands: [],
+      exitCode: undefined
+    });
+    const commandDialog = ref<InstanceType<typeof CommandDialog>>()
 
     return {
       importDialog,
@@ -236,7 +258,10 @@ export default defineComponent({
       newProject,
       deleteProject,
       myUtools,
-      refreshConfigDialog
+      refreshConfigDialog,
+      execResult,
+      commandDialog,
+      exec
     }
   }
 })
@@ -320,7 +345,7 @@ export default defineComponent({
               </div>
               <div style="margin-top: 10px;">
                 <el-button v-if="project.newBranchCmd"
-                           @click="myUtools.evaluateCmd(project.newBranchCmd, {
+                           @click="exec(project.newBranchCmd, {
                               project: project
                            })">新建分支
                 </el-button>
@@ -417,6 +442,7 @@ export default defineComponent({
   <ImportDialog ref="importDialog" @importOK="refreshList"/>
   <ExportDialog ref="exportDialog"/>
   <RefreshDialog ref="refreshConfigDialog" :select-item="selectItem"/>
+  <CommandDialog :execute-result="execResult" ref="commandDialog" />
 </template>
 
 <style scoped>

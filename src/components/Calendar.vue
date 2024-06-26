@@ -380,7 +380,7 @@ export default defineComponent({
               <el-input v-if="customForm.type === 'input'" v-model="customForm.value"/>
             </el-form-item>
             <el-form-item :label="env.envName + '环境'" :label-width="100"
-                          v-for="(env, index) in project.selectEnvs">
+                          v-for="(env, index) in project.selectEnvs" class="env">
               <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{
                   env.fabanBranchName
                 }}分支
@@ -393,11 +393,11 @@ export default defineComponent({
                        target="_blank" class="link">
                 {{ env.envName }}环境地址
               </el-link>
-              <el-text @click="myUtools.evaluateCmd(env.statusCmd)" v-if="env.statusCmd">{{}}</el-text>
+              <el-text @click="myUtools.evaluateCmd(env.statusCmd)" v-if="env.statusCmd" class="link">{{}}</el-text>
               <el-button @click="exec(env.mergeBranchCmd, {
                               project: project,
                               env:env
-                           })" v-if="env.mergeBranchCmd">合并分支
+                           })" v-if="env.mergeBranchCmd" class="link">合并{{project.branch}}到{{env.fabanBranchName}}分支
               </el-button>
               <el-button @click="exec(env.publishCmd, {
                               project: project,
@@ -456,8 +456,13 @@ export default defineComponent({
 </template>
 
 <style scoped>
+:deep(.env .el-form-item__content ){
+  gap: 10px;
+}
+:deep(.env .el-checkbox){
+  margin-right: 0;
+}
 .link {
-  margin-left: 15px;
   font-size: calc(var(--fontSize) - 2px);
 }
 

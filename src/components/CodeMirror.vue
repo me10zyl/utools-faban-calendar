@@ -59,6 +59,14 @@ const envVars = computed((): EnvVar[] => {
       label : '当前环境发版分支',
       variableName: '{{fabanBranchName}}',
       desc: '获取当前环境的发版分支'
+    },{
+      label:'jenkins账号',
+      variableName: '{{jenkinsUsername}}',
+      desc: 'jenkins的账号，用于发版命令'
+    },{
+      label:'jenkins账号或token',
+      variableName: '{{jenkinsPasswordOrToken}}',
+      desc: 'jenkins的账号或toke，用于发版命令'
     }
   ];
 })

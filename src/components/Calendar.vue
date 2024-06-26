@@ -462,6 +462,9 @@ export default defineComponent({
 :deep(.env .el-checkbox){
   margin-right: 0;
 }
+:deep(.env .el-button+.el-button){
+  margin-left: 0;
+}
 .link {
   font-size: calc(var(--fontSize) - 2px);
 }

@@ -98,6 +98,14 @@ export interface Env {
      * 合并代码命令
      */
     mergeBranchCmd?: string,
+    /**
+     * jenkins账号
+     */
+    jenkinsUsername?: string,
+    /**
+     * jenkins密码或token
+     */
+    jenkinsPasswordOrToken?: string
 }
 
 export interface Options {

@@ -219,6 +219,7 @@ export default defineComponent({
       selectItem.value.projects.splice(selectItem.value.projects.indexOf(project), 1)
     }
     const exec = (cmd: string, vars: CmdVars): void =>{
+      execResult.value.exitCode = undefined;
       execResult.value.commands.splice(0, execResult.value.commands.length)
       commandDialog.value.show()
       myUtools.evaluateCmd(cmd, vars, (e)=>{

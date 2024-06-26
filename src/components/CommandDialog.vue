@@ -16,6 +16,8 @@ watch(props.executeResult, ()=>{
     title.value = '命令执行结果窗口 - 执行成功'
   }else if(props.executeResult.exitCode !== undefined){
     title.value = '命令执行结果窗口 - 执行失败'
+  }else {
+    title.value = '命令执行结果窗口'
   }
 })
 defineExpose({

@@ -221,8 +221,9 @@ export default defineComponent({
     const exec = (cmd: string, vars: CmdVars): void =>{
       execResult.value.exitCode = undefined;
       execResult.value.commands.splice(0, execResult.value.commands.length)
+      execResult.value.execScript = ''
       commandDialog.value.show()
-      myUtools.evaluateCmd(cmd, vars, (e)=>{
+      let script = myUtools.evaluateCmd(cmd, vars, (e)=>{
         console.log(e.type + ":",e.data)
         if(e.type === 'finished') {
           execResult.value.exitCode = e.data
@@ -233,11 +234,13 @@ export default defineComponent({
           })
         }
       })
+      execResult.value.execScript = script;
     }
 
     const execResult = ref<Command>({
       commands: [],
-      exitCode: undefined
+      exitCode: undefined,
+      execScript: ""
     });
     const commandDialog = ref<InstanceType<typeof CommandDialog>>()
 
@@ -391,9 +394,15 @@ export default defineComponent({
                 {{ env.envName }}环境地址
               </el-link>
               <el-text @click="myUtools.evaluateCmd(env.statusCmd)" v-if="env.statusCmd">{{}}</el-text>
-              <el-button @click="myUtools.evaluateCmd(env.mergeBranchCmd)" v-if="env.mergeBranchCmd">合并分支
+              <el-button @click="exec(env.mergeBranchCmd, {
+                              project: project,
+                              env:env
+                           })" v-if="env.mergeBranchCmd">合并分支
               </el-button>
-              <el-button @click="myUtools.evaluateCmd(env.publishCmd)" v-if="env.publishCmd">jenkins发布</el-button>
+              <el-button @click="exec(env.publishCmd, {
+                              project: project,
+                              env:env
+                           })" v-if="env.publishCmd">jenkins发布</el-button>
             </el-form-item>
             <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
               <el-row style="width: 100%">

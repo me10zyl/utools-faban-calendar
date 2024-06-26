@@ -2,10 +2,14 @@
 import {defineComponent, PropType, reactive, ref} from "vue";
 import {Env} from "../js/options";
 import {FormInstance, FormRules} from "element-plus";
+import myUtools from "@/js/myUtools";
+import {deepClone} from "@/js/util";
+import CodeMirror from "@/components/CodeMirror.vue";
 
 
 
 export default defineComponent({
+  components: {CodeMirror},
   props : {
     envs : {
       type : Object as PropType<Env[]>,
@@ -13,13 +17,15 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const formData: Env =reactive <Env>({
+    let target = {
       envName: "",
       envTestUrl: "",
       fabanBranchName: "",
       jenkinsUrl: "",
-      startTime: ""
-    })
+      startTime: "",
+      mergeBranchCmd: myUtools.readFile('scripts/merge.bat')
+    };
+    const formData: Env =reactive <Env>(deepClone(target))
     let editObject = null;
     const edit = (row) => {
       dialogVisible.value = true;
@@ -30,8 +36,12 @@ export default defineComponent({
     const add = () => {
       dialogVisible.value = true;
       title.value = '添加环境'
-      if(formEl.value){
-        formEl.value.resetFields()
+      // if(formEl.value){
+      //   formEl.value.resetFields()
+      // }
+      let clone = deepClone(target);
+      for(let key in formData) {
+        formData[key] = clone[key];
       }
       editObject = null
     }
@@ -90,6 +100,9 @@ export default defineComponent({
       </el-form-item>
       <el-form-item label="jenkins地址"  :label-width="100" prop="jenkinsUrl">
         <el-input v-model="formData.jenkinsUrl"/>
+      </el-form-item>
+      <el-form-item label="合并分支命令" :label-width="100" prop="mergeBranchCmd">
+        <code-mirror lang="batch"  v-model="formData.mergeBranchCmd"/>
       </el-form-item>
       <el-form-item label="发版命令" :label-width="100" prop="publishCmd">
         <el-input type="textarea"  v-model="formData.publishCmd"/>

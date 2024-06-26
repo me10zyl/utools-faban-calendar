@@ -4,7 +4,8 @@ export type Status = 'normal' | 'abandon' | 'finished'
 
 export interface Command{
     commands : CommandItem[],
-    exitCode : number
+    exitCode : number,
+    execScript: string
 }
 export interface CommandItem{
     type: 'stdout' | 'stderr',

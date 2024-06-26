@@ -55,6 +55,10 @@ const envVars = computed((): EnvVar[] => {
       label: '正式环境分支',
       variableName: '{{releaseBranch}}',
       desc: '本项目的正式环境分支，用于检出新分支'
+    },{
+      label : '当前环境发版分支',
+      variableName: '{{fabanBranchName}}',
+      desc: '获取当前环境的发版分支'
     }
   ];
 })

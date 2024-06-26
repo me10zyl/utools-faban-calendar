@@ -21,9 +21,9 @@ function exec(cmdContent, callback) {
             args: [tempFilePath]
         }
     }
-    let cmd = cmds.windows;
-    if(utools.isMacOS()){
-        cmds = cmds.mac
+    let cmd = cmds.mac;
+    if(utools.isWindows()){
+        cmd = cmds.windows
     }
     let result = spawn(cmd.exe, cmd.args);
     let response = false;

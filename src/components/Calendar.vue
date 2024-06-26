@@ -408,7 +408,7 @@ export default defineComponent({
                               project: project,
                               env:env
                            })" v-if="env.publishCmd">jenkins发布</el-button>
-              <cmd-status>状态</cmd-status>
+<!--              <cmd-status>状态</cmd-status>-->
             </el-form-item>
             <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
               <el-row style="width: 100%">

@@ -11,7 +11,21 @@ utools.onPluginEnter(({code}) => {
 function exec(cmdContent, callback) {
     const tempFilePath = path.join(os.tmpdir(), `utools_temp_script_${+new Date()}.bat`);
     fs.writeFileSync(tempFilePath, cmdContent);
-    let result = spawn('cmd.exe', ['/S','/C', tempFilePath]);
+    let cmds = {
+        windows : {
+            exe : 'cmd.exe',
+            args: ['/S','/C', tempFilePath]
+        },
+        mac : {
+            exe : 'bash',
+            args: [tempFilePath]
+        }
+    }
+    let cmd = cmds.windows;
+    if(utools.isMacOS()){
+        cmds = cmds.mac
+    }
+    let result = spawn(cmd.exe, cmd.args);
     let response = false;
     let lastMessage = ''
     result.on('close', function (code) {

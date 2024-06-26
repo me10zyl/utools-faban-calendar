@@ -15,10 +15,11 @@ import {sql} from "@codemirror/lang-sql";
 import {onRenderTriggered} from "@vue/runtime-core";
 import CodeMirror from "@/components/CodeMirror.vue";
 import CommandDialog from "@/components/CommandDialog.vue";
+import CmdStatus from "@/components/CmdStatus.vue";
 
 
 export default defineComponent({
-  components: {CommandDialog, CodeMirror, RefreshDialog, ExportDialog, ImportDialog},
+  components: {CmdStatus, CommandDialog, CodeMirror, RefreshDialog, ExportDialog, ImportDialog},
   setup: (props, ctx) => {
     const items = reactive<Item[]>([])
     const projectInit: SelectProject = {
@@ -407,6 +408,7 @@ export default defineComponent({
                               project: project,
                               env:env
                            })" v-if="env.publishCmd">jenkins发布</el-button>
+              <cmd-status>状态</cmd-status>
             </el-form-item>
             <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
               <el-row style="width: 100%">

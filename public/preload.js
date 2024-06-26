@@ -13,11 +13,13 @@ function exec(cmdContent, callback) {
     fs.writeFileSync(tempFilePath, cmdContent);
     let result = spawn('cmd.exe', ['/S','/C', tempFilePath]);
     let response = false;
+    let lastMessage = ''
     result.on('close', function (code) {
         try {
             callback({
                 type : 'finished',
-                data: code
+                data: code,
+                lastMessage: lastMessage
             });
             console.log('process exited with code ' + code);
         } finally {
@@ -26,6 +28,7 @@ function exec(cmdContent, callback) {
     });
     result.stdout.on('data', function (data) {
         response = true;
+        lastMessage = data.toString();
         callback({
             type : 'stdout',
             data: data.toString()
@@ -33,6 +36,7 @@ function exec(cmdContent, callback) {
     });
     result.stderr.on('data', function (data) {
         response = true;
+        lastMessage = data.toString();
         callback({
             type: 'stderr',
             data: data.toString()

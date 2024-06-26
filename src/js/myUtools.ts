@@ -2,12 +2,13 @@ import {Router} from "vue-router";
 import {SelectEnv, SelectProject} from "./calendar";
 import myStorage from "./myStorage";
 import {ElMessage} from "element-plus";
-import {Env} from "./options";
+import {CustomForm, Env} from "./options";
 
 type To = 'Options' | 'Calendar'
 export type CmdVars = {
     project? : SelectProject
     env? :SelectEnv
+    customForm? : CustomForm
 }
 export default {
     init: function (router: Router) {
@@ -58,6 +59,12 @@ export default {
                 for(let key in vars.env){
                     //@ts-ignore
                     cmd = cmd.replaceAll(`{{${key}}}`,vars.env[key])
+                }
+            }
+            if(vars.customForm){
+                for(let key in vars.customForm){
+                    //@ts-ignore
+                    cmd = cmd.replaceAll(`{{${key}}}`,vars.customForm[key])
                 }
             }
         }

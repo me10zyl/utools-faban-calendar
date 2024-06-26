@@ -146,12 +146,12 @@ export default defineComponent({
       <el-form-item label="发版命令" :label-width="120" prop="publishCmd">
         <code-mirror lang="batch" v-model="formData.publishCmd"/>
       </el-form-item>
-      <el-form-item label="程序运行状态检测命令" :label-width="120" prop="statusCmd">
+<!--      <el-form-item label="程序运行状态检测命令" :label-width="120" prop="statusCmd">
         <code-mirror lang="batch" v-model="formData.statusCmd"/>
       </el-form-item>
       <el-form-item label="程序运行开始时间查询命令" :label-width="120" prop="startTimeCmd">
         <code-mirror lang="batch" v-model="formData.startTimeCmd"/>
-      </el-form-item>
+      </el-form-item>-->
     </el-form>
     <template #footer>
       <div class="dialog-footer">

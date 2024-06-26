@@ -374,7 +374,12 @@ export default defineComponent({
             </el-form-item>
             <el-form-item :label="customForm.label" :label-width="100"
                           v-for="(customForm, index) in project.selectCustomForms">
-              <el-button v-if="customForm.type === 'button'" v-model="customForm.value"></el-button>
+              <el-button v-if="customForm.type === 'button'" v-model="customForm.value"
+              @click="exec(customForm.buttonCmd, {
+                              project: project,
+                              customForm: customForm
+                           })"
+              ></el-button>
               <el-checkbox v-if="customForm.type === 'checkbox'"
                            v-model="customForm.value"></el-checkbox>
               <el-input v-if="customForm.type === 'input'" v-model="customForm.value"/>
@@ -393,7 +398,6 @@ export default defineComponent({
                        target="_blank" class="link">
                 {{ env.envName }}环境地址
               </el-link>
-              <el-text @click="myUtools.evaluateCmd(env.statusCmd)" v-if="env.statusCmd" class="link">{{}}</el-text>
               <el-button @click="exec(env.mergeBranchCmd, {
                               project: project,
                               env:env

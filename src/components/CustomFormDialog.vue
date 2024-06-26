@@ -2,6 +2,7 @@
 import {defineComponent, PropType, reactive, ref} from "vue";
 import {ElForm, FormInstance, FormRules} from "element-plus";
 import {CustomForm, CustomType, CustomTypeLabel} from "../js/options";
+import CodeMirror from "@/components/CodeMirror.vue";
 
 
 
@@ -21,6 +22,7 @@ function getLabel(type: CustomType): CustomTypeLabel | null {
 
 
 export default defineComponent({
+  components: {CodeMirror},
   props: {
     customForms: {
       type: Object as PropType<CustomForm[]>,
@@ -130,7 +132,7 @@ export default defineComponent({
         <el-input v-model="formData.label"></el-input>
       </el-form-item>
       <el-form-item prop="buttonCmd" label="自定义按钮执行的命令" :label-width="140" v-if="formData.type === 'button'">
-        <el-input v-model="formData.buttonCmd" type="textarea"></el-input>
+        <code-mirror lang="batch" v-model="formData.buttonCmd"></code-mirror>
       </el-form-item>
     </el-form>
     <template #footer>

@@ -1,5 +1,5 @@
 import {Router} from "vue-router";
-import {SelectEnv, SelectProject} from "./calendar";
+import {SelectCustomForm, SelectEnv, SelectProject} from "./calendar";
 import myStorage from "./myStorage";
 import {ElMessage} from "element-plus";
 import {CustomForm, Env} from "./options";
@@ -8,7 +8,7 @@ type To = 'Options' | 'Calendar'
 export type CmdVars = {
     project? : SelectProject
     env? :SelectEnv
-    customForm? : CustomForm
+    customForm? : SelectCustomForm
 }
 export default {
     init: function (router: Router) {

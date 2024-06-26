@@ -379,7 +379,7 @@ export default defineComponent({
                               project: project,
                               customForm: customForm
                            })"
-              ></el-button>
+              >{{customForm.label}}</el-button>
               <el-checkbox v-if="customForm.type === 'checkbox'"
                            v-model="customForm.value"></el-checkbox>
               <el-input v-if="customForm.type === 'input'" v-model="customForm.value"/>

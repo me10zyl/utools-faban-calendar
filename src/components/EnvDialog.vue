@@ -28,21 +28,27 @@ export default defineComponent({
     const formData: Env = reactive<Env>(deepClone(target))
     let editObject = null;
     const edit = (row) => {
+      reset()
       dialogVisible.value = true;
       title.value = '编辑环境'
       Object.assign(formData, row)
       editObject = row;
     }
+
+    function reset() {
+      let clone = deepClone(target);
+      for (let key in formData) {
+        formData[key] = clone[key];
+      }
+    }
+
     const add = () => {
       dialogVisible.value = true;
       title.value = '添加环境'
       // if(formEl.value){
       //   formEl.value.resetFields()
       // }
-      let clone = deepClone(target);
-      for (let key in formData) {
-        formData[key] = clone[key];
-      }
+      reset();
       editObject = null
     }
     const del = (row) => {

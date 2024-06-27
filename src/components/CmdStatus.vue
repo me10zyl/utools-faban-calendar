@@ -12,20 +12,22 @@ const props = defineProps<{
 
 const lastMessage = ref<string>('')
 const exitCode = ref<number>(-1)
-
-onUpdated(() => {
+const runExec = () => {
   myUtools.evaluateCmd(props.cmd, props.cmdVars, (e: ExecCallback) => {
     if (e.type === 'finished') {
       lastMessage.value = e.lastMessage;
       exitCode.value = e.data as number;
     }
   })
+}
+onUpdated(() => {
+  runExec()
 })
 
 </script>
 
 <template>
-  <div>
+  <div @click="runExec">
     <span>{{label}}</span>
     <span>{{ lastMessage ? lastMessage : initMessage }}</span>
   </div>

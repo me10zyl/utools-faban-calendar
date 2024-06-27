@@ -20,7 +20,7 @@ onMounted(() => {
   let extensions = [basicSetup, EditorView.updateListener.of(update => {
     if (update.docChanged) {
       // emit('update:model-value', editorView.state.doc.text.join('\n'))
-       sqlText.value = editorView.state.doc.text.join('\n')
+       sqlText.value = editorView.state.doc.toString()
        sqlText['docChangedEvent'] = true
     }
   })];

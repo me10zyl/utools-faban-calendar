@@ -407,11 +407,11 @@ export default defineComponent({
               <el-button @click="exec(env.publishCmd, {
                               project: project,
                               env:env
-                           })" v-if="env.publishCmd">jenkins发布</el-button>
-              <cmd-status :cmd-vars="{
+                           })" v-if="env.publishCmd">jenkins发布{{project.projectName}}</el-button>
+<!--              <cmd-status :cmd-vars="{
                 project: project,
                 env: env
-              }" />
+              }" />-->
             </el-form-item>
             <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
               <el-row style="width: 100%">

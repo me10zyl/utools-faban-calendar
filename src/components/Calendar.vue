@@ -1,6 +1,6 @@
 <script lang="ts">
 import {computed, defineComponent, nextTick, onMounted, onUpdated, reactive, ref, watch} from "vue";
-import {Command, CommandItem, Item, SelectCustomForm, SelectEnv, SelectProject} from "../js/calendar";
+import {Command, CommandItem, ExecCallback, Item, SelectCustomForm, SelectEnv, SelectProject} from "../js/calendar";
 import myStorage from "../js/myStorage";
 import {deepClone, generateRandomString, now} from "../js/util";
 import router from '../router'
@@ -224,14 +224,14 @@ export default defineComponent({
       execResult.value.commands.splice(0, execResult.value.commands.length)
       execResult.value.execScript = ''
       commandDialog.value.show()
-      let script = myUtools.evaluateCmd(cmd, vars, (e)=>{
+      let script = myUtools.evaluateCmd(cmd, vars, (e: ExecCallback)=>{
         console.log(e.type + ":",e.data)
         if(e.type === 'finished') {
-          execResult.value.exitCode = e.data
+          execResult.value.exitCode = e.data as number
         }else{
           execResult.value.commands.push({
             type: e.type,
-            text: e.data
+            text: e.data as string
           })
         }
       })
@@ -408,7 +408,10 @@ export default defineComponent({
                               project: project,
                               env:env
                            })" v-if="env.publishCmd">jenkins发布</el-button>
-<!--              <cmd-status>状态</cmd-status>-->
+              <cmd-status :cmd-vars="{
+                project: project,
+                env: env
+              }" />
             </el-form-item>
             <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
               <el-row style="width: 100%">

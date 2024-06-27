@@ -2,6 +2,12 @@ import {CustomForm, Env, Project} from "./options";
 
 export type Status = 'normal' | 'abandon' | 'finished'
 
+export interface ExecCallback{
+    type:  'stdout' | 'stderr' | 'finished',
+    lastMessage: string,
+    data: string | number
+}
+
 export interface Command{
     commands : CommandItem[],
     exitCode : number,

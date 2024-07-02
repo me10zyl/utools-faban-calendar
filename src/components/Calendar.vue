@@ -219,16 +219,16 @@ export default defineComponent({
     const deleteProject = (project) => {
       selectItem.value.projects.splice(selectItem.value.projects.indexOf(project), 1)
     }
-    const exec = (cmd: string, vars: CmdVars): void =>{
+    const exec = (cmd: string, vars: CmdVars): void => {
       execResult.value.exitCode = undefined;
       execResult.value.commands.splice(0, execResult.value.commands.length)
       execResult.value.execScript = ''
       commandDialog.value.show()
-      let script = myUtools.evaluateCmd(cmd, vars, (e: ExecCallback)=>{
-        console.log(e.type + ":",e.data)
-        if(e.type === 'finished') {
+      let script = myUtools.evaluateCmd(cmd, vars, (e: ExecCallback) => {
+        console.log(e.type + ":", e.data)
+        if (e.type === 'finished') {
           execResult.value.exitCode = e.data as number
-        }else{
+        } else {
           execResult.value.commands.push({
             type: e.type,
             text: e.data as string
@@ -244,8 +244,11 @@ export default defineComponent({
       execScript: ""
     });
     const commandDialog = ref<InstanceType<typeof CommandDialog>>()
-
+    const font = reactive({
+      color: 'rgba(0, 0, 0, .15)',
+    })
     return {
+      font,
       importDialog,
       items,
       selectItem,
@@ -274,7 +277,7 @@ export default defineComponent({
 
 <template>
   <el-row style="margin: 0;padding: 0">
-    <el-col  class="left" >
+    <el-col class="left">
       <div class="toolbox">
         <el-button @click="clickNew" size="small">新建</el-button>
         <el-popconfirm title="确认删除?" cancel-button-text="取消" confirm-button-text="确认" @confirm="deleteItem">
@@ -315,7 +318,7 @@ export default defineComponent({
         </li>
       </ol>
     </el-col>
-    <el-col  class="right">
+    <el-col class="right">
       <div :class="{title:true, abandon: selectItem.status === 'abandon', success: selectItem.status === 'finished'}">
         {{ selectItem.reqName || (items.filter(e => e.selected).length > 0 ? '新建需求' : '') }}
       </div>
@@ -328,102 +331,107 @@ export default defineComponent({
             </el-col>
           </el-form-item>
           <template v-for="(project, index) in selectItem.projects">
-            <el-divider v-if="index !== 0"/>
-            <el-form-item label="选择项目" :label-width="100">
-              <el-col :span="8">
-                <el-select v-model="project.selectProjectName" @change="projectChange(project)"
-                           placeholder="选择项目">
-                  <el-option v-for="project in options.projects"
-                             :key="project.projectName"
-                             :label="project.projectName"
-                             :value="project.projectName"
-                  >
-                  </el-option>
-                </el-select>
-              </el-col>
-              <div style="margin-left: 10px">
-                <el-input v-model="project.branch" placeholder="填写本需求新建的分支"
-                          v-if="project"/>
-              </div>
-              <div style="margin-left: 10px">
-                <el-button>复制分支名称</el-button>
-              </div>
-              <div style="margin-top: 10px;">
-                <el-button v-if="project.newBranchCmd"
-                           @click="exec(project.newBranchCmd, {
+            <div :font="font" :content="project.projectName" :z-index="-999">
+              <el-divider v-if="index !== 0"/>
+              <el-form-item label="选择项目" :label-width="100">
+                <el-col :span="8">
+                  <el-select v-model="project.selectProjectName" @change="projectChange(project)"
+                             placeholder="选择项目">
+                    <el-option v-for="project in options.projects"
+                               :key="project.projectName"
+                               :label="project.projectName"
+                               :value="project.projectName"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-col>
+                <div style="margin-left: 10px">
+                  <el-input v-model="project.branch" placeholder="填写本需求新建的分支"
+                            v-if="project"/>
+                </div>
+                <div style="margin-left: 10px">
+                  <el-button>复制分支名称</el-button>
+                </div>
+                <div style="margin-top: 10px;">
+                  <el-button v-if="project.newBranchCmd"
+                             @click="exec(project.newBranchCmd, {
                               project: project
                            })">新建分支
-                </el-button>
-              </div>
-            </el-form-item>
+                  </el-button>
+                </div>
+              </el-form-item>
 
-            <div style="margin-bottom: 18px;padding-left: 100px">
-              <el-text>{{ project.projectDesc }}</el-text>
-            </div>
-            <el-form-item :label-width="100" v-if="project.showSQL">
-              <el-checkbox v-model="project.isUpdateSQL">已更数据库</el-checkbox>
-              <!--              <el-input type="textarea" placeholder="数据库文本" v-model="selectItem.sql"/>-->
-              <CodeMirror v-model="project.sql" lang="sql"/>
-            </el-form-item>
-            <el-form-item :label="project.configCenterName + '配置'" :label-width="100"
-                          v-if="project.showConfigCenter">
-              <el-checkbox v-model="project.isUpdateConfigCenter">
-                已更新{{ project.configCenterName }}配置
-              </el-checkbox>
-              <el-input type="textarea" :placeholder="project.configCenterName + '配置'"
-                        v-model="project.updateConfigCenterText"/>
-            </el-form-item>
-            <el-form-item :label="customForm.label" :label-width="100"
-                          v-for="(customForm, index) in project.selectCustomForms">
-              <el-button v-if="customForm.type === 'button'" v-model="customForm.value"
-              @click="exec(customForm.buttonCmd, {
+              <div style="margin-bottom: 18px;padding-left: 100px">
+                <el-text>{{ project.projectDesc }}</el-text>
+              </div>
+              <el-form-item :label-width="100" v-if="project.showSQL">
+                <el-checkbox v-model="project.isUpdateSQL">已更数据库</el-checkbox>
+                <!--              <el-input type="textarea" placeholder="数据库文本" v-model="selectItem.sql"/>-->
+                <CodeMirror v-model="project.sql" lang="sql"/>
+              </el-form-item>
+              <el-form-item :label="project.configCenterName + '配置'" :label-width="100"
+                            v-if="project.showConfigCenter">
+                <el-checkbox v-model="project.isUpdateConfigCenter">
+                  已更新{{ project.configCenterName }}配置
+                </el-checkbox>
+                <el-input type="textarea" :placeholder="project.configCenterName + '配置'"
+                          v-model="project.updateConfigCenterText"/>
+              </el-form-item>
+              <el-form-item :label="customForm.label" :label-width="100"
+                            v-for="(customForm, index) in project.selectCustomForms">
+                <el-button v-if="customForm.type === 'button'" v-model="customForm.value"
+                           @click="exec(customForm.buttonCmd, {
                               project: project,
                               customForm: customForm
                            })"
-              >{{customForm.label}}</el-button>
-              <el-checkbox v-if="customForm.type === 'checkbox'"
-                           v-model="customForm.value"></el-checkbox>
-              <el-input v-if="customForm.type === 'input'" v-model="customForm.value"/>
-            </el-form-item>
-            <el-form-item :label="env.envName + '环境'" :label-width="100"
-                          v-for="(env, index) in project.selectEnvs" class="env">
-              <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{
-                  env.fabanBranchName
-                }}分支
-              </el-checkbox>
-              <el-checkbox v-model="env.isPublished">已发版</el-checkbox>
-              <el-link :href="env.jenkinsUrl" @click="myUtools.shellOpen(env.jenkinsUrl)" v-if="env.jenkinsUrl"
-                       target="_blank" class="link">jenkins地址
-              </el-link>
-              <el-link :href="env.envTestUrl" @click="myUtools.shellOpen(env.envTestUrl)" v-if="env.envTestUrl"
-                       target="_blank" class="link">
-                {{ env.envName }}环境地址
-              </el-link>
-              <el-button @click="exec(env.mergeBranchCmd, {
+                >{{ customForm.label }}
+                </el-button>
+                <el-checkbox v-if="customForm.type === 'checkbox'"
+                             v-model="customForm.value"></el-checkbox>
+                <el-input v-if="customForm.type === 'input'" v-model="customForm.value"/>
+              </el-form-item>
+              <el-form-item :label="env.envName + '环境'" :label-width="100"
+                            v-for="(env, index) in project.selectEnvs" class="env">
+                <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{
+                    env.fabanBranchName
+                  }}分支
+                </el-checkbox>
+                <el-checkbox v-model="env.isPublished">已发版</el-checkbox>
+                <el-link :href="env.jenkinsUrl" @click="myUtools.shellOpen(env.jenkinsUrl)" v-if="env.jenkinsUrl"
+                         target="_blank" class="link">jenkins地址
+                </el-link>
+                <el-link :href="env.envTestUrl" @click="myUtools.shellOpen(env.envTestUrl)" v-if="env.envTestUrl"
+                         target="_blank" class="link">
+                  {{ env.envName }}环境地址
+                </el-link>
+                <el-button @click="exec(env.mergeBranchCmd, {
                               project: project,
                               env:env
-                           })" v-if="env.mergeBranchCmd" class="link">合并{{project.branch}}到{{env.fabanBranchName}}分支
-              </el-button>
-              <el-button @click="exec(env.publishCmd, {
+                           })" v-if="env.mergeBranchCmd" class="link">
+                  合并{{ project.branch }}到{{ env.fabanBranchName }}分支
+                </el-button>
+                <el-button @click="exec(env.publishCmd, {
                               project: project,
                               env:env
-                           })" v-if="env.publishCmd">jenkins发布{{project.projectName}}</el-button>
-<!--              <cmd-status :cmd-vars="{
-                project: project,
-                env: env
-              }" />-->
-            </el-form-item>
-            <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
-              <el-row style="width: 100%">
-                <el-col :span="15">
-                  <el-input type="textarea" v-model="project.projectInfo" :rows="5"/>
-                </el-col>
-              </el-row>
-            </el-form-item>
-            <div style="display: flex;justify-content: right;">
-              <el-button type="warning" @click="deleteProject(project)">移除项目
-                {{ project.selectProjectName ? project.selectProjectName : '' }}
-              </el-button>
+                           })" v-if="env.publishCmd">{{env.envName}}环境发布{{ project.projectName }}
+                </el-button>
+                <!--              <cmd-status :cmd-vars="{
+                                project: project,
+                                env: env
+                              }" />-->
+              </el-form-item>
+              <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
+                <el-row style="width: 100%">
+                  <el-col :span="15">
+                    <el-input type="textarea" v-model="project.projectInfo" :rows="5"/>
+                  </el-col>
+                </el-row>
+              </el-form-item>
+              <div style="display: flex;justify-content: right;">
+                <el-button type="warning" @click="deleteProject(project)">移除项目
+                  {{ project.selectProjectName ? project.selectProjectName : '' }}
+                </el-button>
+              </div>
             </div>
           </template>
           <div style="display: flex;justify-content: right;margin-top: 15px">
@@ -461,19 +469,22 @@ export default defineComponent({
   <ImportDialog ref="importDialog" @importOK="refreshList"/>
   <ExportDialog ref="exportDialog"/>
   <RefreshDialog ref="refreshConfigDialog" :select-item="selectItem"/>
-  <CommandDialog :execute-result="execResult" ref="commandDialog" />
+  <CommandDialog :execute-result="execResult" ref="commandDialog"/>
 </template>
 
 <style scoped>
-:deep(.env .el-form-item__content ){
+:deep(.env .el-form-item__content ) {
   gap: 10px;
 }
-:deep(.env .el-checkbox){
+
+:deep(.env .el-checkbox) {
   margin-right: 0;
 }
-:deep(.env .el-button+.el-button){
+
+:deep(.env .el-button+.el-button) {
   margin-left: 0;
 }
+
 .link {
   font-size: calc(var(--fontSize) - 2px);
 }

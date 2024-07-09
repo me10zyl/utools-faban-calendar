@@ -368,10 +368,11 @@ export default defineComponent({
             </el-col>
           </el-form-item>
           <template v-for="(project, index) in selectItem.projects">
-            <el-collapse :id="'col' + index" class="col" v-model="activeNames" >
-              <el-collapse-item :title="project.projectName ? project.projectName : '选择项目...'" :name="'col' + index">
+            <div :id="'col' + index" class="col" :model="activeNames" >
+              <el-divider v-if="index !== 0" style="margin-bottom:10px"/>
+              <div class="leftProjectName">{{project.projectName}}</div>
+              <div :title="project.projectName ? project.projectName : '选择项目...'" :name="'col'  + index">
                 <div :font="font" :content="project.projectName" :z-index="-999" >
-                  <!--              <el-divider v-if="index !== 0"/>-->
                   <el-form-item label="选择项目" :label-width="100">
                     <el-col :span="8">
                       <el-select v-model="project.selectProjectName" @change="projectChange(project)"
@@ -472,8 +473,8 @@ export default defineComponent({
                     </el-button>
                   </div>
                 </div>
-              </el-collapse-item>
-            </el-collapse>
+              </div>
+            </div>
           </template>
           <div style="display: flex;justify-content: right;margin-top: 15px">
             <el-button @click="newProject" type="primary">
@@ -542,6 +543,14 @@ export default defineComponent({
 
 .link {
   font-size: calc(var(--fontSize) - 2px);
+}
+
+.leftProjectName{
+  font-size: calc(var(--fontSize) + 2px);
+  font-weight: bold;
+  margin-bottom: 5px;
+  margin-left: 10px;
+  color: var(--fontColor);
 }
 
 .anchor {

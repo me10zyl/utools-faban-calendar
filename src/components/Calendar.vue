@@ -116,7 +116,6 @@ export default defineComponent({
             active = true;
           }
         }
-        console.log('actitt', activeAnchor.value)
       });
     })
     const goToSettings = () => {
@@ -432,6 +431,10 @@ export default defineComponent({
                   </el-form-item>
                   <el-form-item :label="env.envName + '环境'" :label-width="100"
                                 v-for="(env, index) in project.selectEnvs" class="env">
+<!--                    <CmdStatus :cmd-vars="{-->
+<!--                              project: project,-->
+<!--                              env:env-->
+<!--                           }" :cmd="env.statusMergedCmd">是否合并分支:</CmdStatus>-->
                     <el-checkbox v-model="env.isMergedFabanBranch">已合并到{{
                         env.fabanBranchName
                       }}分支

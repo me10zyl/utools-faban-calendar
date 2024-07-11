@@ -1,7 +1,7 @@
-
+@echo off
 cd {{basePath}} || goto :error
-if  not exist {{projectName}}-{{fabanBranchName}} (
-    git clone {{gitUrl}} {{projectName}}-{{fabanBranchName}} || goto :error
+if not exist {{projectName}}-{{fabanBranchName}} (
+    git clone {{gitUrl}} {{projectName}} || goto :error
 )
 cd {{projectName}}-{{fabanBranchName}} || goto :error
 git checkout {{fabanBranchName}} || goto :error
@@ -13,15 +13,15 @@ if %CURRENT_BRANCH% NEQ {{fabanBranchName}} (
     echo branch not correct: %CURRENT_BRANCH% not {{fabanBranchName}}
     goto :error
 )
-git pull || goto :error
-git pull origin {{branch}} --no-commit || (echo Merge failed detected!
-    goto :error
+git branch --contains {{branch}}
+set MSG={{fabanBranchName}}未合并{{branch}}
+if %errorlevel% EQU 0 (
+    set MSG={{fabanBranchName}}已合并{{branch}}
+    goto :end
 )
-git commit --no-edit
-git push
 goto :end
 :error
-echo A command failed. Exiting script.
+echo 执行脚本失败
 exit /b 1
 :end
-echo Script finished successfully.
+echo %MSG%

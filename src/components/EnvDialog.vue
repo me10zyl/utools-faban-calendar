@@ -12,18 +12,22 @@ export default defineComponent({
   props: {
     envs: {
       type: Object as PropType<Env[]>,
-      required: true
+      required: true,
+    },
+    syncBtn: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props) {
-    let target = {
+    let target:Env = {
       envName: "",
       envTestUrl: "",
       fabanBranchName: "",
       jenkinsUrl: "",
-      startTime: "",
       mergeBranchCmd: myUtools.readFile('scripts/merge.bat'),
-      publishCmd: myUtools.readFile('scripts/publish.bat')
+      publishCmd: myUtools.readFile('scripts/publish.bat'),
+      statusMergedCmd: myUtools.readFile('scripts/status-merged.bat'),
     };
     const formData: Env = reactive<Env>(deepClone(target))
     let editObject = null;
@@ -141,10 +145,13 @@ export default defineComponent({
         <el-input v-model="formData.jenkinsPasswordOrToken" class="el-col-12" type="password"/>
       </el-form-item>
       <el-form-item label="合并分支命令" :label-width="120" prop="mergeBranchCmd">
-        <code-mirror lang="batch" v-model="formData.mergeBranchCmd"/>
+        <code-mirror lang="batch" v-model="formData.mergeBranchCmd" :sync-btn="syncBtn" :env-name="formData.envName" cmd-text="mergeBranchCmd"/>
       </el-form-item>
       <el-form-item label="发版命令" :label-width="120" prop="publishCmd">
-        <code-mirror lang="batch" v-model="formData.publishCmd"/>
+        <code-mirror lang="batch" v-model="formData.publishCmd" :sync-btn="syncBtn" :env-name="formData.envName" cmd-text="publishCmd"/>
+      </el-form-item>
+      <el-form-item label="查询分支合并状态" :label-width="120" prop="statusMergedCmd">
+        <code-mirror lang="batch" v-model="formData.statusMergedCmd" :sync-btn="syncBtn" :env-name="formData.envName" cmd-text="statusMergedCmd"/>
       </el-form-item>
 <!--      <el-form-item label="程序运行状态检测命令" :label-width="120" prop="statusCmd">
         <code-mirror lang="batch" v-model="formData.statusCmd"/>

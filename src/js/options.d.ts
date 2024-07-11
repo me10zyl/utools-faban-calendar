@@ -67,26 +67,6 @@ export interface Env {
      */
     projectPath?: string,
     /**
-     * 发版命令
-     */
-    publishCmd?: string,
-    /**
-     * 状态查询命令
-     */
-    statusCmd?: string,
-    /**
-     * 程序运行开始时间
-     */
-    startTimeCmd?: string,
-    /**
-     * 程序状态
-     */
-    status?: Status,
-    /**
-     * 运行开始时间
-     */
-    startTime: string,
-    /**
      * 环境测试地址
      */
     envTestUrl: string,
@@ -95,10 +75,6 @@ export interface Env {
      */
     jenkinsUrl: string,
     /**
-     * 合并代码命令
-     */
-    mergeBranchCmd?: string,
-    /**
      * jenkins账号
      */
     jenkinsUsername?: string,
@@ -106,6 +82,26 @@ export interface Env {
      * jenkins密码或token
      */
     jenkinsPasswordOrToken?: string
+    /**
+     * 状态
+     */
+    statusMergedCmd?: string
+    /**
+     * 发版命令
+     */
+    publishCmd?: string,
+    /**
+     * 合并代码命令
+     */
+    mergeBranchCmd?: string,
+    /**
+     * 状态查询命令
+     */
+    statusCmd?: string,
+    /**
+     * 程序运行开始时间
+     */
+    statusStartTimeCmd?: string,
 }
 
 export interface Options {

@@ -2,6 +2,11 @@
 import {computed, onMounted, onUpdated, ref, watch} from "vue";
 import {basicSetup, EditorView} from "codemirror";
 import {sql} from "@codemirror/lang-sql";
+import storage from "@/js/storage";
+import myStorage from "@/js/myStorage";
+import {Env, Project} from "@/js/options.d";
+import {ElMessage} from "element-plus";
+import {b} from "vite/dist/node/types.d-aGj9QkWt";
 
 interface EnvVar {
   label: string
@@ -11,9 +16,16 @@ interface EnvVar {
 }
 
 let sqlText = defineModel<string>({required: true});
-let props = defineProps<{
-  lang: string
-}>();
+let props = withDefaults(defineProps<{
+  lang: string,
+  syncBtn: boolean,
+  cmdText?: 'statusMergedCmd' | 'publishCmd' | 'mergeBranchCmd' | 'statusCmd' | 'statusStartTimeCmd',
+  envName?: 'string'
+}>(), {
+  syncBtn(props) {
+      return false
+  },
+})
 // const emit = defineEmits(['update:model-value']);
 let editorView = null;
 onMounted(() => {
@@ -84,11 +96,33 @@ onUpdated(()=>{
   }
   sqlText['docChangedEvent'] = false
 })
+  const syncOtherEnv = ()=>{
+    let options = myStorage.getOptions();
+    let success: boolean = false;
+    options.projects.forEach((p: Project)=>{
+      p.envs.forEach((env: Env)=>{
+        if(env.envName === props.envName) {
+          env[props.cmdText] = sqlText.value;
+          success = true;
+        }
+      })
+    })
+    if(success) {
+      myStorage.saveOptions(options)
+      ElMessage('同步成功, 请重新进入程序应用更改')
+    }
+  }
 </script>
 
 <template>
   <div v-if="lang === 'batch'">
     <el-link @click="showDialog = true" class="var">查看可用环境变量</el-link>
+    <el-popconfirm title="确认同步?同步后相同环境的本脚本将会一起改变" cancel-button-text="取消" confirm-button-text="确认" @confirm="syncOtherEnv" v-if="syncBtn && cmdText && envName">
+      <template #reference>
+        <el-link class="var" style="margin-left: 15px">同步其他环境</el-link>
+      </template>
+    </el-popconfirm>
+
   </div>
   <div ref="sqlEl" id="sqlEl">
   </div>

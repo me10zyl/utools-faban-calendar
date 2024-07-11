@@ -26,6 +26,8 @@ export default defineComponent({
     const projectDialog = ref()
     const projects = reactive<Project[]>([]);
     const editProject = (row:Project) => {
+/*      let opts: Options = myStorage.getOptions();
+      let project = opts.projects.find(e=>e.projectName === row.projectName);*/
       projectDialog.value.edit(row)
     }
     const delProject = (row:Project) => {
@@ -198,7 +200,7 @@ export default defineComponent({
   </div>
   <ProjectDialog ref="projectDialog" :projects="projects"/>
   <CustomFormDialog ref="customFormDialog" :custom-forms="formData.defaultCustomForms"/>
-  <EnvDialog  ref="envDialog" :envs="formData.defaultEnvs" />
+  <EnvDialog  ref="envDialog" :envs="formData.defaultEnvs" :sync-btn="true" />
 </template>
 
 <style scoped>

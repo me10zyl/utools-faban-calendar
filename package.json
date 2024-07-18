@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@codemirror/lang-sql": "^6.7.0",
+    "@codemirror/lang-yaml": "^6.1.1",
     "codemirror": "^6.0.1",
     "element-plus": "^2.7.5",
+    "vditor": "^3.10.4",
     "vue": "^3.4.21",
     "vue-router": "^4.3.3"
   },

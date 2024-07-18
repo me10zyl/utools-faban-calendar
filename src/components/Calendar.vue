@@ -16,10 +16,13 @@ import {onRenderTriggered} from "@vue/runtime-core";
 import CodeMirror from "@/components/CodeMirror.vue";
 import CommandDialog from "@/components/CommandDialog.vue";
 import CmdStatus from "@/components/CmdStatus.vue";
+import ViditorEditor from "@/components/ViditorEditor.vue";
 
 
 export default defineComponent({
-  components: {CmdStatus, CommandDialog, CodeMirror, RefreshDialog, ExportDialog, ImportDialog},
+  components: {
+    ViditorEditor,
+     CmdStatus, CommandDialog, CodeMirror, RefreshDialog, ExportDialog, ImportDialog},
   setup: (props, ctx) => {
     const items = reactive<Item[]>([])
     const projectInit: SelectProject = {
@@ -106,17 +109,19 @@ export default defineComponent({
     })
     onUpdated(() => {
       let cols = document.querySelectorAll('.col')
-      mainEl.value.addEventListener("scroll", (event) => {
-        activeAnchor.value = 'col0'
-        let active = false;
-        for(let i = cols.length - 1; i >= 0; i--){
-          //@ts-ignore
-          if(mainEl.value.scrollTop >= (cols[i].offsetTop - mainEl.value.offsetTop) && !active){
-            activeAnchor.value = 'col' + i
-            active = true;
+      if(mainEl.value) {
+        mainEl.value.addEventListener("scroll", (event) => {
+          activeAnchor.value = 'col0'
+          let active = false;
+          for (let i = cols.length - 1; i >= 0; i--) {
+            //@ts-ignore
+            if (mainEl.value.scrollTop >= (cols[i].offsetTop - mainEl.value.offsetTop) && !active) {
+              activeAnchor.value = 'col' + i
+              active = true;
+            }
           }
-        }
-      });
+        });
+      }
     })
     const goToSettings = () => {
       myUtools.redirect("Options")
@@ -420,8 +425,9 @@ export default defineComponent({
                     <el-checkbox v-model="project.isUpdateConfigCenter">
                       已更新{{ project.configCenterName }}配置
                     </el-checkbox>
-                    <el-input type="textarea" :placeholder="project.configCenterName + '配置'"
-                              v-model="project.updateConfigCenterText"/>
+<!--                    <el-input type="textarea" :placeholder="project.configCenterName + '配置'"-->
+<!--                              v-model="project.updateConfigCenterText"/>-->
+                    <code-mirror lang="yaml" v-model="project.updateConfigCenterText"></code-mirror>
                   </el-form-item>
                   <el-form-item :label="customForm.label" :label-width="100"
                                 v-for="(customForm, index) in project.selectCustomForms">
@@ -470,6 +476,7 @@ export default defineComponent({
                     <el-row style="width: 100%">
                       <el-col :span="15">
                         <el-input type="textarea" v-model="project.projectInfo" :rows="5"/>
+<!--                        <ViditorEditor />-->
                       </el-col>
                     </el-row>
                   </el-form-item>

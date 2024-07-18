@@ -7,6 +7,7 @@ import myStorage from "@/js/myStorage";
 import {Env, Project} from "@/js/options.d";
 import {ElMessage} from "element-plus";
 import {b} from "vite/dist/node/types.d-aGj9QkWt";
+import {yaml} from "@codemirror/lang-yaml";
 
 interface EnvVar {
   label: string
@@ -38,6 +39,8 @@ onMounted(() => {
   })];
   if (props.lang === 'sql') {
     extensions.push(sql())
+  }else if(props.lang === 'yaml'){
+    extensions.push(yaml())
   }
   editorView = new EditorView({
     doc: sqlText.value,

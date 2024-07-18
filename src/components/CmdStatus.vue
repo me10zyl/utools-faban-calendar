@@ -11,20 +11,21 @@ const props = defineProps<{
 
 
 const lastMessage = ref<string>('')
-const exitCode = ref<number>(-1)
+const execResult = ref<Command>({
+  commands: [],
+  exitCode: undefined,
+  execScript: ""
+})
 const runExec = () => {
-  console.log(props)
   execResult.value.exitCode = undefined;
   execResult.value.commands.splice(0, execResult.value.commands.length)
   execResult.value.execScript = ''
-  let cmd = myUtools.readFile('scripts/status-merged.bat');
-  console.log(props.cmd,'cccc')
+  // let cmd = myUtools.readFile('scripts/status-merged.bat');
   const script = myUtools.evaluateCmd(props.cmd, props.cmdVars, (e: ExecCallback) => {
-    console.log('exec:', e)
     commandDialog.value.show()
     if (e.type === 'finished') {
-      lastMessage.value = e.lastMessage;
-      exitCode.value = e.data as number;
+      lastMessage.value = ':' + e.lastMessage;
+      execResult.value.exitCode = e.data as number
     }else{
       execResult.value.commands.push({
         type: e.type,
@@ -34,28 +35,31 @@ const runExec = () => {
   });
   execResult.value.execScript = script;
 }
-const execResult = ref<Command>({
-  commands: [],
-  exitCode: undefined,
-  execScript: ""
-});
+
 const commandDialog = ref<InstanceType<typeof CommandDialog>>()
 onUpdated(() => {
-  runExec()
+  lastMessage.value = ''
 })
 
 </script>
 
 <template>
-  <div @click="runExec" class="cmdStatus">
+  <el-button @click="runExec" class="cmdStatus">
     <slot></slot>
-    <span>{{ lastMessage }}</span>
-  </div>
-  <CommandDialog :execute-result="execResult" ref="commandDialog"/>
+    <span class="success">{{ lastMessage }}</span>
+  </el-button>
+  <teleport to="body">
+    <CommandDialog :execute-result="execResult" ref="commandDialog"/>
+  </teleport>
 </template>
 
 <style scoped>
 .cmdStatus{
   cursor: pointer;
+  color: var(--fontColor);
 }
+.success {
+  color: #09bcd6;
+}
+
 </style>

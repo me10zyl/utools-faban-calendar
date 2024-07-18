@@ -1,7 +1,7 @@
 @echo off
 cd {{basePath}} || goto :error
 if not exist {{projectName}}-{{fabanBranchName}} (
-    git clone {{gitUrl}} {{projectName}} || goto :error
+    git clone {{gitUrl}} {{projectName}}-{{fabanBranchName}} || goto :error
 )
 cd {{projectName}}-{{fabanBranchName}} || goto :error
 git checkout {{fabanBranchName}} || goto :error
@@ -13,10 +13,11 @@ if %CURRENT_BRANCH% NEQ {{fabanBranchName}} (
     echo branch not correct: %CURRENT_BRANCH% not {{fabanBranchName}}
     goto :error
 )
-git branch --contains {{branch}}
-set MSG={{fabanBranchName}}未合并{{branch}}
+git fetch
+git merge-base --is-ancestor  origin/{{branch}}  {{fabanBranchName}}
+set MSG={{fabanBranchName}} not merge {{branch}}
 if %errorlevel% EQU 0 (
-    set MSG={{fabanBranchName}}已合并{{branch}}
+    set MSG={{fabanBranchName}} has merged {{branch}}
     goto :end
 )
 goto :end

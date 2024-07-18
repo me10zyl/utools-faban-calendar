@@ -1,4 +1,4 @@
-
+@echo off
 cd {{basePath}} || goto :error
 if  not exist {{projectName}}-{{fabanBranchName}} (
     git clone {{gitUrl}} {{projectName}}-{{fabanBranchName}} || goto :error
@@ -15,6 +15,7 @@ if %CURRENT_BRANCH% NEQ {{fabanBranchName}} (
 )
 git pull || goto :error
 git pull origin {{branch}} --no-commit || (echo Merge failed detected!
+    git merge --abort
     goto :error
 )
 git commit --no-edit

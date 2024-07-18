@@ -274,6 +274,15 @@ export default defineComponent({
     }
     const activeNames = ref<string[]>(['col' + 0])
     const activeAnchor = ref<string>('col0')
+    const newBranch = (cmd: string, vars : CmdVars, project: SelectProject)=>{
+      if(!project.branch || project.branch.trim() === ''){
+        ElMessage('分支名不能为空')
+        return
+      }
+      exec(cmd, vars)
+      myUtools.copy(project.branch.trim())
+      ElMessage('已复制分支名:' + project.branch.trim())
+    }
     return {
       activeAnchor,
       activeNames,
@@ -301,7 +310,8 @@ export default defineComponent({
       refreshConfigDialog,
       execResult,
       commandDialog,
-      exec
+      exec,
+      newBranch
     }
   }
 })
@@ -388,14 +398,11 @@ export default defineComponent({
                       <el-input v-model="project.branch" placeholder="填写本需求新建的分支"
                                 v-if="project"/>
                     </div>
-                    <div style="margin-left: 10px">
-                      <el-button>复制分支名称</el-button>
-                    </div>
-                    <div style="margin-top: 10px;">
+                    <div style="margin-left: 10px;">
                       <el-button v-if="project.newBranchCmd"
-                                 @click="exec(project.newBranchCmd, {
+                                 @click="newBranch(project.newBranchCmd, {
                               project: project
-                           })">新建分支
+                           }, project)">新建分支
                       </el-button>
                     </div>
                   </el-form-item>

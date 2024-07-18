@@ -464,7 +464,7 @@ export default defineComponent({
                     <CmdStatus :cmd-vars="{
                               project: project,
                               env:env
-                           }" :cmd="env.statusMergedCmd">检查是否已合并到{{ env.fabanBranchName }}分支</CmdStatus>
+                           }" :cmd="env.statusMergedCmd" v-if="env.statusMergedCmd">检查是否已合并到{{ env.fabanBranchName }}分支</CmdStatus>
                   </el-form-item>
                   <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
                     <el-row style="width: 100%">

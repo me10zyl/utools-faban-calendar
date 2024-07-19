@@ -69,7 +69,7 @@ export default defineComponent({
       selectItem.value.id = generateRandomString()
       selectItem.value.createTime = now();
       selectItem.value.selected = true
-      items.push(selectItem.value)
+      items.splice(0, 0, selectItem.value)
     }
     const clickItem = (item: Item) => {
       unSelectAll()
@@ -224,9 +224,9 @@ export default defineComponent({
       items.splice(0, items.length)
       const calendars = myStorage.getCalendars();
       startWatch()
-      calendars.forEach(e => {
-        items.push(e)
-      });
+      for (let i = 0; i < calendars.length; i++) {
+        items.push(calendars[i])
+      }
       items.forEach(e => {
         if (e.selected) {
           clickItem(e)

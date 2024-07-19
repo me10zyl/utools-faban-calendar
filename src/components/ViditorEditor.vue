@@ -84,12 +84,12 @@ onUpdated(()=>{
   font-size: var(--fontSize);
 }
 :deep(.vditor-reset ul){
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 :deep(.vditor-reset p),
 :deep(.vditor-reset pre) {
-  margin: 5px 0;
+  margin: 2px 0;
 }
 :deep(.vditor-reset h1),
 :deep(.vditor-reset h2),
@@ -98,6 +98,13 @@ onUpdated(()=>{
 :deep(.vditor-reset h5),
 :deep(.vditor-reset h6){
   padding-bottom: 0;
-  margin: 5px;
+  margin: 3px;
+}
+
+:deep(.vditor-toolbar){
+  padding-left: 3px !important ;
+}
+:deep(pre.vditor-reset){
+  padding: 5px !important;
 }
 </style>

@@ -37,6 +37,9 @@ export default {
     },
     getCalendars(): Item[]{
         let itemObject = storage.getItemObject<Item[]>('faban-calendar-calendars');
+        itemObject.sort((a:Item,b:Item)=>{
+            return -a.createTime.localeCompare(b.createTime)
+        })
         return itemObject ? itemObject : []
     }
 }

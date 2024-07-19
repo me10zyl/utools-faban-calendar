@@ -22,7 +22,7 @@ if %errorlevel% EQU 0 (
 )
 goto :end
 :error
-echo 执行脚本失败
+echo execute script error.
 exit /b 1
 :end
 echo %MSG%

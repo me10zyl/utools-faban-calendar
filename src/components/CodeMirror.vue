@@ -19,7 +19,7 @@ interface EnvVar {
 let sqlText = defineModel<string>({required: true});
 let props = withDefaults(defineProps<{
   lang: string,
-  syncBtn: boolean,
+  syncBtn?: boolean,
   cmdText?: 'statusMergedCmd' | 'publishCmd' | 'mergeBranchCmd' | 'statusCmd' | 'statusStartTimeCmd',
   envName?: 'string'
 }>(), {

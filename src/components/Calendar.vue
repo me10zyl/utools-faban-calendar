@@ -474,9 +474,9 @@ export default defineComponent({
                   </el-form-item>
                   <el-form-item label="项目说明" :label-width="100" v-if="project.showProjectInfo">
                     <el-row style="width: 100%">
-                      <el-col :span="15">
-                        <el-input type="textarea" v-model="project.projectInfo" :rows="5"/>
-<!--                        <ViditorEditor />-->
+                      <el-col >
+<!--                        <el-input type="textarea" v-model="project.projectInfo" :rows="5"/>-->
+                        <ViditorEditor v-model="project.projectInfo"/>
                       </el-col>
                     </el-row>
                   </el-form-item>

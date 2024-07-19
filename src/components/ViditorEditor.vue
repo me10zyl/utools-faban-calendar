@@ -21,7 +21,7 @@ onMounted(()=>{
     mode: 'ir',
     toolbar: [
       // 'emoji' , 'headings' , 'bold' , 'italic' , 'strike' , '|' , 'line' , 'quote' , 'list' , 'ordered-list' , 'check' ,'outdent' ,'indent' , 'code' , 'inline-code' , 'insert-after' , 'insert-before' ,'undo' , 'redo' , 'upload' , 'link' , 'table' , 'record' , 'edit-mode' , 'both' , 'preview' , 'fullscreen' , 'outline' , 'code-theme' , 'content-theme' , 'export', 'devtools' , 'info' , 'help' , 'br'
-        'emoji', 'upload', 'check', 'list', 'ordered-list', 'table', 'fullscreen'
+        'emoji', 'upload', 'check', 'list', 'ordered-list', 'table',  'link', '|' ,'fullscreen', 'export'
     ],
     toolbarConfig: {
       pin: false,

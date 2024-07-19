@@ -143,10 +143,10 @@ export default defineComponent({
           <code-mirror v-model="formData.newBranchCmd" lang="batch"></code-mirror>
         </el-form-item>
         <el-form-item label="自定义按钮" :label-width="100" prop="customForms">
-          <el-button @click="customFormDialog.add">添加自定义菜单</el-button>
-          <el-popconfirm title="此操作会覆盖默认菜单到当前项目菜单，确认覆盖?" cancel-button-text="取消" confirm-button-text="确认" @confirm="coverDefaultCustomForm">
+          <el-button @click="customFormDialog.add">添加自定义表单</el-button>
+          <el-popconfirm title="此操作会覆盖默认按钮到当前项目表单，确认覆盖?" cancel-button-text="取消" confirm-button-text="确认" @confirm="coverDefaultCustomForm">
             <template #reference>
-              <el-button @click="">刷新默认自定义菜单</el-button>
+              <el-button @click="">刷新默认自定义表单</el-button>
             </template>
           </el-popconfirm>
           <el-table :data="formData.customForms" border style="margin-top:10px;" width="100%">

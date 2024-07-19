@@ -141,7 +141,7 @@ export default defineComponent({
             <el-checkbox v-model="formData.defaultShowProjectInfo"></el-checkbox>
           </el-form-item>
           <el-form-item label="默认自定义表单" :label-width="120" prop="defaultCustomForms">
-            <el-button @click="customFormAdd(customFormDialog)">添加自定义菜单</el-button>
+            <el-button @click="customFormAdd(customFormDialog)">添加自定义表单</el-button>
             <el-table :data="formData.defaultCustomForms" border style="margin-top:10px;" width="100%">
               <el-table-column prop="label" label="表单标签" width="100"/>
               <el-table-column prop="typeString" label="表单类型" width="60"/>

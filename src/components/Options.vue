@@ -174,6 +174,11 @@ export default defineComponent({
           <el-form-item label="数据备份保存路径" :label-width="120" prop="basePath">
             <el-input v-model="formData.bakPath" />
           </el-form-item>
+          <el-tooltip content="markdown上传图片图床的token,获取方法：使用API POST https://sm.ms/api/v2/token， 参考链接：https://doc.sm.ms/" placement="top-start">
+            <el-form-item label="sm.ms Token" :label-width="120" prop="smmsToken">
+              <el-input v-model="formData.smmsToken" />
+            </el-form-item>
+          </el-tooltip>
         </div>
       </el-form>
       <div>

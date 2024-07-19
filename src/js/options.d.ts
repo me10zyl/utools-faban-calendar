@@ -30,7 +30,11 @@ export interface DefaultOptions {
     /**
      *
      */
-    bakPath?: string
+    bakPath?: string,
+    /**
+     * SMMS授权token
+     */
+    smmsToken?: string,
 }
 export type CustomType = 'checkbox' | 'input' | 'button';
 export type CustomTypeLabel = '复选框' | '输入框' | '按钮'

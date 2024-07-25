@@ -132,7 +132,7 @@ export default defineComponent({
         <el-input v-model="formData.label"></el-input>
       </el-form-item>
       <el-form-item prop="buttonCmd" label="自定义按钮执行的命令" :label-width="140" v-if="formData.type === 'button'">
-        <code-mirror lang="batch" v-model="formData.buttonCmd"></code-mirror>
+        <code-mirror lang="batch" v-model="formData.buttonCmd" :sync-btn="true" :custom-btn-name="formData.label" ></code-mirror>
       </el-form-item>
     </el-form>
     <template #footer>

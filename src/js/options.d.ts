@@ -110,7 +110,8 @@ export interface Env {
 
 export interface Options {
     defaultOptions: DefaultOptions,
-    projects: Project[]
+    projects: Project[],
+    hideAbandon?: boolean
 }
 export interface Project {
     /**

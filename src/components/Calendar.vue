@@ -288,7 +288,14 @@ export default defineComponent({
       myUtools.copy(project.branch.trim())
       ElMessage('已复制分支名:' + project.branch.trim())
     }
+    const switchHideAbandon = ()=>{
+      setTimeout(()=>{
+        myStorage.saveOptions(options)
+      }, 1)
+      refreshList()
+    }
     return {
+      switchHideAbandon,
       activeAnchor,
       activeNames,
       clickAnchor,
@@ -351,13 +358,19 @@ export default defineComponent({
                   </template>
                 </el-popconfirm>
               </el-dropdown-item>
+              <el-dropdown-item>
+                <el-switch  size="small"
+                            v-model="options.hideAbandon"
+                            @change="switchHideAbandon"
+                            inactive-text="隐藏废弃/完成"></el-switch>
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
       </div>
       <el-divider style="margin-top: calc(var(--toolHeight) + 10px);  margin-bottom: 0; padding-bottom: 0;height: 0"/>
       <ol class="list">
-        <li v-for="item in items" :class="{'select-active': item.selected, 'abandon' : item.status === 'abandon'
+        <li v-for="item in items.filter(e=>!options.hideAbandon || (options.hideAbandon && e.status === 'normal'))" :class="{'select-active': item.selected, 'abandon' : item.status === 'abandon'
         , success: item.status === 'finished'}"
             @click="clickItem(item)"
             style="cursor: pointer">

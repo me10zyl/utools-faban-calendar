@@ -8,6 +8,11 @@ utools.onPluginEnter(({code}) => {
         window.codeChanged(code)
     }
 });
+
+window.replaceUrl = function (concretePath){
+    return path.join(__dirname, concretePath)
+}
+
 function exec(cmdContent, callback) {
     const tempFilePath = path.join(os.tmpdir(), `utools_temp_script_${+new Date()}.bat`);
     fs.writeFileSync(tempFilePath, cmdContent);

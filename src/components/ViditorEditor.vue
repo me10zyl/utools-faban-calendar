@@ -16,7 +16,7 @@ function getFileName(url:string){
 }
 onMounted(()=>{
   contentEditor = new Vditor(vditorEl.value, {
-    cdn: '',
+    cdn: window.replaceUrl('/vditor'),
     height: 300,
     mode: 'ir',
     toolbar: [

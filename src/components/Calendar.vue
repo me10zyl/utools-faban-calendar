@@ -131,6 +131,12 @@ export default defineComponent({
       const result = []
       for (let i in item.projects) {
         const project: SelectProject = item.projects[i];
+        if(project.selectEnvs.length > 0){
+          if(project.selectEnvs.filter((e: SelectEnv) => e.isPublished && e.envName.match(/(正式|生产)/)).length > 0) {
+            continue;
+          }
+        }
+
         const errors = [];
         if (!project.projectName) {
           errors.push("有未选择的项目")
@@ -288,8 +294,8 @@ export default defineComponent({
       myUtools.copy(project.branch.trim())
       ElMessage('已复制分支名:' + project.branch.trim())
     }
-    const switchHideAbandon = ()=>{
-      setTimeout(()=>{
+    const switchHideAbandon = ()=> {
+      setTimeout(() => {
         myStorage.saveOptions(options)
       }, 1)
       refreshList()

@@ -62,20 +62,26 @@ function exec(cmdContent, callback) {
         });
     });
 }
-const writeFile = (type, basePath, content)=>{
-    if(type === 'options'){
-        fs.writeFile(path.resolve(basePath, 'options.txt'), content, err => {
-            if (err) {
-                console.error(err);
-            }
+const saveBackupFiles = (type, backupDir, content)=>{
+    // 确保备份文件夹存在
+    if (!fs.existsSync(backupDir)) {
+        fs.mkdirSync(backupDir);
+    }
+    const timestamp = new Date().toISOString().replace(/[-T:\.Z]/g, '');
+    const filename = `${type}_${timestamp}.txt`;
+    const filePath = path.join(backupDir, filename);
+    fs.writeFile(filePath, content, err => {
+        if (err) {
+            console.error(err);
+        }
+    });
+    const files = fs.readdirSync(backupDir).filter(file => file.startsWith(`${type}_`) && file.endsWith('.txt'));
+    if (files.length > 30) {
+        // 按时间排序，删除最早的备份文件
+        files.sort().slice(0, files.length - 30).forEach(file => {
+            fs.unlinkSync(path.join(backupDir, file));
+            console.log(`Deleted old backup: ${file}`);
         });
-    }else{
-        fs.writeFile(path.resolve(basePath,'calendars.txt'), content, err => {
-            if (err) {
-                console.error(err);
-            }
-        });
-
     }
 }
 const readFile = (path1)=>{
@@ -84,6 +90,6 @@ const readFile = (path1)=>{
 
 window.services = {
     exec,
-    writeFile,
+    saveBackupFiles,
     readFile
 }

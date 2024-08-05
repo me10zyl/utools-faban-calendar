@@ -5,6 +5,7 @@ import 'vditor/dist/index.css'
 import {onMounted, onUpdated, ref} from "vue";
 import myUtools from "@/js/myUtools";
 import myStorage from "@/js/myStorage";
+import {mermaidRender} from "vditor/dist/ts/markdown/mermaidRender";
 const content = defineModel<string>();
 const vditorEl = ref<HTMLElement>(null)
 let contentEditor:Vditor = null;

@@ -8,7 +8,7 @@ export default {
         storage.setItem('faban-calendar-options', options)
         if(options.defaultOptions.bakPath) {
             //@ts-ignore
-            window.services.writeFile('options', options.defaultOptions.bakPath, JSON.stringify(options))
+            window.services.saveBackupFiles('options', options.defaultOptions.bakPath, JSON.stringify(options))
         }
     },
     getOptions(): Options {
@@ -22,17 +22,12 @@ export default {
         return opts
     },
     saveCalendar(items: Item[]) :void  {
-        // let calendars = this.getCalendars();
-        // let index = calendars.findIndex(e=>e.id === item.id);
-        // if(index === -1){
-        //     item.
-        // }
         storage.setItem('faban-calendar-calendars', items)
         let opts = this.getOptions();
         //@ts-ignore
         if(opts?.defaultOptions?.bakPath) {
             //@ts-ignore
-            window.services.writeFile('calendars', opts.defaultOptions.bakPath, JSON.stringify(items))
+            window.services.saveBackupFiles('calendars', opts.defaultOptions.bakPath, JSON.stringify(items))
         }
     },
     getCalendars(): Item[]{

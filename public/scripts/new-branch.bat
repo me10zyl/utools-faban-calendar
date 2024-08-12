@@ -4,6 +4,7 @@ if not exist {{projectName}} (
     git clone {{gitUrl}} {{projectName}} || goto :error
 )
 cd {{projectName}} || goto :error
+git pull
 git branch {{branch}} origin/{{releaseBranch}} || goto :error
 git push -u origin {{branch}} || goto :error
 goto :end

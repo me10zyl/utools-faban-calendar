@@ -34,6 +34,9 @@ export default {
             }
         }
     },
+    deleteCalendarById(itemId: string){
+        storage.removeItem('faban-calendar-calendars-id/' + itemId)
+    },
    /* saveCalendar(items: Item[]) :void  {
         storage.setItem('faban-calendar-calendars', items)
         let opts = this.getOptions();

@@ -53,7 +53,9 @@ export default defineComponent({
     const selectItem = ref<Item>(dynamic);
     const options = myStorage.getOptions();
     const deleteItem = () => {
-      items.splice(items.findIndex(e => e.id === selectItem.value.id), 1)
+      let id = selectItem.value.id;
+      items.splice(items.findIndex(e => e.id === id), 1)
+      myStorage.deleteCalendarById(id)
       reset()
     }
 

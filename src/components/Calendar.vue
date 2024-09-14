@@ -70,10 +70,13 @@ export default defineComponent({
     const clickNew = () => {
       unSelectAll()
       reset();
+      watchRef();
       selectItem.value.id = generateRandomString()
       selectItem.value.createTime = now();
       selectItem.value.selected = true
       items.splice(0, 0, selectItem.value)
+      myStorage.saveCalendarById(selectItem.value, true);
+      watchRef = startWatch();
     }
     const clickItem = (item: Item) => {
       unSelectAll()
@@ -98,6 +101,7 @@ export default defineComponent({
     }
     const startWatch = () => {
       return watch(selectItem.value, (value: Item, oldValue, onCleanup) => {
+        console.log('selectItem.changed')
         myStorage.saveCalendarById(value, true);
         const errors = checkSuccess(selectItem.value);
         if (errors.length === 0 && selectItem.value.status === 'normal') {

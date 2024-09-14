@@ -73,6 +73,10 @@ export interface SelectEnv extends Partial<Env>{
      */
     isMergedFabanBranch?: boolean,
 }
+export interface Flag{
+    label: string,
+    type: 'primary' | 'warning' | 'success' | 'danger' | 'info'
+}
 export interface Item{
     /**
      * guid
@@ -97,5 +101,9 @@ export interface Item{
     /**
      * 状态
      */
-    status: Status
+    status: Status,
+    /**
+     * 标记/优先级
+     */
+    flag: Flag
 }

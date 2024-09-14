@@ -28,7 +28,14 @@ const doImport = (importType : ImportType)=>{
     try {
       if (importType === 'calendar') {
         if(Array.isArray(json) && json[0].reqName != undefined) {
-          myStorage.saveCalendar(json)
+          json.forEach(e=>{
+            if(e.id === undefined){
+              ElMessage('导入格式错误')
+              return
+            }
+            myStorage.saveCalendarById(e, false)
+          })
+          //myStorage.saveCalendar(json)
         }else{
           ElMessage('导入格式错误')
           return

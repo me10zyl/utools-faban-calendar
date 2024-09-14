@@ -17,10 +17,12 @@ import CodeMirror from "@/components/CodeMirror.vue";
 import CommandDialog from "@/components/CommandDialog.vue";
 import CmdStatus from "@/components/CmdStatus.vue";
 import ViditorEditor from "@/components/ViditorEditor.vue";
+import FlagDialog from "@/components/FlagDialog.vue";
 
 
 export default defineComponent({
   components: {
+    FlagDialog,
     ViditorEditor,
      CmdStatus, CommandDialog, CodeMirror, RefreshDialog, ExportDialog, ImportDialog},
   setup: (props, ctx) => {
@@ -192,6 +194,7 @@ export default defineComponent({
 
     const importDialog = ref<InstanceType<typeof ImportDialog>>()
     const exportDialog = ref<InstanceType<typeof ExportDialog>>()
+    const flagDialog = ref<InstanceType<typeof FlagDialog>>()
     const refreshConfigDialog = ref<InstanceType<typeof RefreshDialog>>()
     const clearAll = () => {
       items.splice(0, items.length)
@@ -306,6 +309,7 @@ export default defineComponent({
       switchHideAbandon,
       activeAnchor,
       activeNames,
+      flagDialog,
       clickAnchor,
       projectEls,
       mainEl,
@@ -355,6 +359,9 @@ export default defineComponent({
             </span>
           <template #dropdown>
             <el-dropdown-menu>
+              <el-dropdown-item @click="flagDialog.show(selectItem)">
+                设置优先级
+              </el-dropdown-item>
               <el-dropdown-item @click="importDialog.show()">导入</el-dropdown-item>
               <el-dropdown-item @click="exportDialog.show()">导出</el-dropdown-item>
               <el-dropdown-item>
@@ -382,7 +389,7 @@ export default defineComponent({
         , success: item.status === 'finished'}"
             @click="clickItem(item)"
             style="cursor: pointer">
-          {{ item.reqName || '新建需求' }}
+          {{ item.reqName || '新建需求' }} <el-tag v-if="item.flag" :type="item.flag.type">{{ item.flag.label }}</el-tag>
         </li>
       </ol>
     </el-col>
@@ -546,6 +553,7 @@ export default defineComponent({
   <ExportDialog ref="exportDialog"/>
   <RefreshDialog ref="refreshConfigDialog" :select-item="selectItem"/>
   <CommandDialog :execute-result="execResult" ref="commandDialog"/>
+  <FlagDialog ref="flagDialog" />
 </template>
 
 <style scoped>

@@ -34,7 +34,7 @@ export default {
             }
         }
     },
-    saveCalendar(items: Item[]) :void  {
+   /* saveCalendar(items: Item[]) :void  {
         storage.setItem('faban-calendar-calendars', items)
         let opts = this.getOptions();
         //@ts-ignore
@@ -42,7 +42,7 @@ export default {
             //@ts-ignore
             window.services.saveBackupFiles('calendars', opts.defaultOptions.bakPath, JSON.stringify(items))
         }
-    },
+    },*/
     getCalendars(): Item[]{
         let itemObject = storage.getItemObject<Item[]>('faban-calendar-calendars');
         if(itemObject){

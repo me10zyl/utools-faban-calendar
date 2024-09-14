@@ -74,7 +74,9 @@ export default defineComponent({
     const clickItem = (item: Item) => {
       unSelectAll()
       item.selected = true
+      watchRef();
       selectItem.value = item
+      watchRef = startWatch();
       item.projects.forEach(p => {
         projectChange(p)
       })
@@ -91,8 +93,8 @@ export default defineComponent({
       }
     }
     const startWatch = () => {
-      return watch(items, (value: Item[], oldValue, onCleanup) => {
-        myStorage.saveCalendar(items);
+      return watch(selectItem.value, (value: Item, oldValue, onCleanup) => {
+        myStorage.saveCalendarById(value, true);
         const errors = checkSuccess(selectItem.value);
         if (errors.length === 0 && selectItem.value.status === 'normal') {
           selectItem.value.status = 'finished'
@@ -102,7 +104,7 @@ export default defineComponent({
       });
     }
 
-    const watchRef = startWatch()
+    let watchRef = startWatch()
 
     onMounted(() => {
       refreshList()
@@ -229,7 +231,7 @@ export default defineComponent({
       watchRef()
       items.splice(0, items.length)
       const calendars = myStorage.getCalendars();
-      startWatch()
+      watchRef = startWatch();
       for (let i = 0; i < calendars.length; i++) {
         items.push(calendars[i])
       }

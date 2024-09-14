@@ -21,6 +21,19 @@ export default {
         }
         return opts
     },
+    saveCalendarById(item: Item, bakUp: boolean) :void  {
+        console.log('save calendar by id', item)
+        if(item.id) {
+            storage.setItem('faban-calendar-calendars-id/' + item.id, item)
+            console.log('save calendar by id', item)
+            let opts = this.getOptions();
+            //@ts-ignore
+            if (bakUp && opts?.defaultOptions?.bakPath) {
+                //@ts-ignore
+                window.services.saveBackupFiles('calendars', opts.defaultOptions.bakPath, JSON.stringify(this.getCalendars()))
+            }
+        }
+    },
     saveCalendar(items: Item[]) :void  {
         storage.setItem('faban-calendar-calendars', items)
         let opts = this.getOptions();
@@ -32,6 +45,17 @@ export default {
     },
     getCalendars(): Item[]{
         let itemObject = storage.getItemObject<Item[]>('faban-calendar-calendars');
+        if(itemObject){
+            itemObject.forEach(e=>{
+                this.saveCalendarById(e, false);
+            })
+            storage.removeItem('faban-calendar-calendars')
+        }
+        //@ts-ignore
+        let allDocs = utools.db.allDocs('faban-calendar-calendars-id/');
+        itemObject = allDocs.map(e=>{
+            return JSON.parse(e.value);
+        })
         itemObject.sort((a:Item,b:Item)=>{
             return -a.createTime.localeCompare(b.createTime)
         })

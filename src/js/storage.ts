@@ -1,5 +1,6 @@
 function setItem(key: string, value: Object):void
 function setItem(key: string, value: string):void {
+    //@ts-ignore
     if (typeof value === 'string') {
         // @ts-ignore
         utools.dbStorage.setItem(key, value)
@@ -13,9 +14,13 @@ function getItem(key: string): string {
     // @ts-ignore
     return utools.dbStorage.getItem(key)
 }
+function removeItem(key: string){
+    // @ts-ignore
+    utools.dbStorage.removeItem(key)
+}
 function getItemObject<T>(key: string): T {
     // @ts-ignore
-    let item = utools.dbStorage.getItem(key);
+    let item = getItem(key);
     if(item == null){
         return null;
     }
@@ -24,5 +29,6 @@ function getItemObject<T>(key: string): T {
 export default {
     setItem: setItem,
     getItem: getItem,
-    getItemObject: getItemObject
+    getItemObject: getItemObject,
+    removeItem: removeItem
 }

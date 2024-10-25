@@ -19,7 +19,7 @@ const doSearch = ()=>{
   let string = ''
 
   function getString(item: Item) {
-    return item.createTime + ' ' + item.reqName + '\n';
+    return item.createTime + ' ' + item.reqName +  '\n';
   }
 
   for (let i = 0; i < calendars.length; i++) {
@@ -36,6 +36,9 @@ const doSearch = ()=>{
     }else{
       string += getString(item)
     }
+  }
+  if(string.endsWith("\n")){
+    string = string.substring(0, string.length - 1)
   }
   exportData.value = string
 }

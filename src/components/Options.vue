@@ -118,7 +118,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="el-container">
+  <div class="el-container" id="content">
     <div class="el-col-23">
       <el-link style="margin-bottom: 5px" @click="myUtools.redirect('Calendar')">←发版日历</el-link>
       <el-form style="margin-bottom: 10px" :model="formData" ref="formEl" :rules="rules" label-position="left">
@@ -216,5 +216,11 @@ export default defineComponent({
 a {
   text-decoration: none;
   color: #10234b;
+}
+
+@media (prefers-color-scheme: dark) {
+  #content {
+    background: #ffffff;
+  }
 }
 </style>

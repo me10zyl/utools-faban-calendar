@@ -640,10 +640,22 @@ export default defineComponent({
   flex: 0 0 32%;
 }
 
+
+
+
 .right {
   height: 97vh;
   max-width: 68%;
   flex: 0 0 68%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .left {
+    background: #ffffff;
+  }
+  .right {
+    background: #f1f1f1;
+  }
 }
 
 .list {

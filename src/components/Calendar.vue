@@ -18,10 +18,12 @@ import CommandDialog from "@/components/CommandDialog.vue";
 import CmdStatus from "@/components/CmdStatus.vue";
 import ViditorEditor from "@/components/ViditorEditor.vue";
 import FlagDialog from "@/components/FlagDialog.vue";
+import FormatExportDialog from "@/components/FormatExportDialog.vue";
 
 
 export default defineComponent({
   components: {
+    FormatExportDialog,
     FlagDialog,
     ViditorEditor,
      CmdStatus, CommandDialog, CodeMirror, RefreshDialog, ExportDialog, ImportDialog},
@@ -201,6 +203,7 @@ export default defineComponent({
     const importDialog = ref<InstanceType<typeof ImportDialog>>()
     const exportDialog = ref<InstanceType<typeof ExportDialog>>()
     const flagDialog = ref<InstanceType<typeof FlagDialog>>()
+    const formatExportDialog = ref<InstanceType<typeof FormatExportDialog>>();
     const refreshConfigDialog = ref<InstanceType<typeof RefreshDialog>>()
     const clearAll = () => {
       items.splice(0, items.length)
@@ -312,6 +315,7 @@ export default defineComponent({
       refreshList()
     }
     return {
+      formatExportDialog,
       switchHideAbandon,
       activeAnchor,
       activeNames,
@@ -368,6 +372,7 @@ export default defineComponent({
               <el-dropdown-item @click="flagDialog.show(selectItem)">
                 设置优先级
               </el-dropdown-item>
+              <el-dropdown-item @click="formatExportDialog.show()">格式化导出</el-dropdown-item>
               <el-dropdown-item @click="importDialog.show()">导入</el-dropdown-item>
               <el-dropdown-item @click="exportDialog.show()">导出</el-dropdown-item>
               <el-dropdown-item>
@@ -560,6 +565,7 @@ export default defineComponent({
   <RefreshDialog ref="refreshConfigDialog" :select-item="selectItem"/>
   <CommandDialog :execute-result="execResult" ref="commandDialog"/>
   <FlagDialog ref="flagDialog" />
+  <FormatExportDialog ref="formatExportDialog" />
 </template>
 
 <style scoped>

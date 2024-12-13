@@ -81,8 +81,11 @@ export default defineComponent({
       watchRef = startWatch();
     }
     const clickItem = (item: Item) => {
+      // selectItem.value.selected = false
       unSelectAll()
+      myStorage.saveCalendarById(selectItem.value, false);
       item.selected = true
+      // myStorage.saveCalendarById(item, false);
       watchRef();
       selectItem.value = item
       watchRef = startWatch();
@@ -249,6 +252,7 @@ export default defineComponent({
       }
       items.forEach(e => {
         if (e.selected) {
+          console.log('selected:', e.reqName)
           clickItem(e)
         }
       })

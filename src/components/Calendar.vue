@@ -213,27 +213,52 @@ export default defineComponent({
     }
 
     const projectChange = (project: SelectProject) => {
-      Object.assign(project, options.projects.find(e => e.projectName === project.selectProjectName));
+      const isProjectChanged = project.selectProjectName && project.projectName !== project.selectProjectName;
+      if (isProjectChanged) {
+        project.selectEnvs = [];
+        project.selectCustomForms = [];
+        project.isUpdateSQL = false;
+        project.isUpdateConfigCenter = false;
+        project.sql = "";
+        project.updateConfigCenterText = "";
+        project.projectInfo = "";
+        project.branch = "";
+      }
+
+      const optionProject = options.projects.find(e => e.projectName === project.selectProjectName);
+      if (!optionProject) {
+        return;
+      }
+      Object.assign(project, optionProject);
+
       if (project.envs) {
+        if (!project.selectEnvs) {
+          project.selectEnvs = [];
+        }
         project.envs.forEach((e, index) => {
-          if (project.selectEnvs && index in project.selectEnvs) {
+          if (index in project.selectEnvs) {
             Object.assign(project.selectEnvs[index], e)
           } else {
             const selectEnv: SelectEnv = {
-              selectEnvName: e.envName
+              selectEnvName: e.envName,
+              isMergedFabanBranch: false,
+              isPublished: false
             }
             project.selectEnvs.push(Object.assign(selectEnv, e))
           }
         })
       }
       if (project.customForms) {
+        if (!project.selectCustomForms) {
+          project.selectCustomForms = [];
+        }
         project.customForms.forEach((e, index) => {
-          if (project.selectCustomForms && index in project?.selectCustomForms) {
+          if (index in project.selectCustomForms) {
             Object.assign(project.selectCustomForms[index], e)
           } else {
             const select: SelectCustomForm = {
               selectLabel: e.label,
-              value: undefined
+              value: e.type === 'checkbox' ? false : undefined
             }
             project.selectCustomForms.push(Object.assign(select, e))
           }
